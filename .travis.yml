@@ -1,4 +1,7 @@
-language: python
+env:
+  global:
+    # only do for Python >= 3.6.
+    - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-*"
 
 matrix:
   include:
