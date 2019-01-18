@@ -1,18 +1,26 @@
 language: python
-python:
-    - "3.6"
-    - "3.7"
-    
-    
+
 matrix:
   include:
-    - sudo: required
+    - language: python
+      dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
+      sudo: required
+      python: "3.7"
       services:
         - docker
-      env: PIP=pip
     - os: osx
-      language: generic
-      env: PIP=pip2
+      osx_image: xcode8.3
+
+install:
+# Python 3 is needed to run cibuildwheel for websockets.
+  - if [ "${TRAVIS_OS_NAME:-}" == "osx" ]; then
+      brew update;
+      brew upgrade python;
+    fi
+# Install cibuildwheel using pip3 to make sure Python 3 is used.
+  - pip3 install --upgrade cibuildwheel
+# Create file '.cibuildwheel' so that extension build is not optional (c.f. setup.py).
+  - touch .cibuildwheel
 
 script:
   - $PIP install cibuildwheel==0.10.0
