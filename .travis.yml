@@ -23,5 +23,4 @@ install:
   - touch .cibuildwheel
 
 script:
-  - $PIP install cibuildwheel==0.10.0
   - cibuildwheel --output-dir wheelhouse
