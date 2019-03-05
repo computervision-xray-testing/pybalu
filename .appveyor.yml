@@ -1,0 +1,28 @@
+branches:
+  only:
+    - master
+
+environment:
+  global:
+    # only do for Python >= 3.6.
+    CIBW_SKIP: "cp27-* cp33-* cp34-* cp35-*"
+    CIBW_BEFORE_BUILD: "python -m pip install -r requirements.txt"
+
+    TWINE_USERNAME: mabucchi
+    TWINE_PASSWORD:
+      secure: ffBVdW93F+PhTrof4BvLYw==
+
+install:
+  - python -m pip install cibuildwheel==0.10.1
+
+build_script:
+  - cibuildwheel --output-dir dist
+
+deploy_script:
+  - python -m pip install twine
+  # Remove for deployment to official PyPi repo
+  - "python -m twine upload --repository-url https://test.pypi.org/legacy/ --skip-existing dist\\*.whl"
+
+artifacts:
+  - path: "dist\\*.whl"
+    name: Wheels

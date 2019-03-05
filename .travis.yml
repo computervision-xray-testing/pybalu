@@ -1,24 +1,29 @@
 env:
   global:
-    # only do for Python >= 3.6.
-    - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-* *-manylinux1_i686"
-    - CIBW_BEFORE_BUILD="python -m pip install -r requirements.txt"
+  - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-* *-manylinux1_i686"
+  - CIBW_BEFORE_BUILD="python -m pip install -r requirements.txt"
 matrix:
   include:
-    - language: python
-      dist: xenial    # required for Python 3.7 (travis-ci/travis-ci#9069)
-      sudo: required
-      python: "3.7"
-      services:
-        - docker
-      install:
-        - pip3 install --upgrade cibuildwheel
-        - touch .cibuildwheel
-    - os: osx
-      language: generic
-      install:
-        - sudo pip2 install --upgrade cibuildwheel
-        - touch .cibuildwheel
-
+  - language: python
+    dist: xenial
+    sudo: required
+    python: '3.7'
+    services:
+    - docker
+    install:
+    - pip3 install --upgrade cibuildwheel
+    - touch .cibuildwheel
+  - os: osx
+    language: generic
+    install:
+    - sudo pip2 install --upgrade cibuildwheel
+    - touch .cibuildwheel
 script:
-  - cibuildwheel --output-dir wheelhouse
+- cibuildwheel --output-dir dist
+deploy:
+  provider: pypi
+  server: https://testpypi.python.org/pypi # Remove for deployment to official PyPi repo
+  user: mabucchi
+  password:
+    secure: KYsU0zhPKH0H/mjnURuhfh+uls6/hOtss2vny2T4XB3ji7721FlZQ1FQ8Hgxub8kcfjPZ/2extmBfi4rlLNZu5y4vltLpCXfvU1495g+RY9MI5azfNRrM4TMxzDG/91b06YgfLeVIR/n/4zuNhykOns80UE5U2MJch5oAjrSwkQjosjxdWz7z7PL1Livu4AgRRHULiMzEkCxEKrmfowa5WK1019jBblbrGl8RWamGx9orKf5sRLobuMXcLKxeQyQ2ah7UY1up9///t5GZTUXZP79osDDMghR2R0TigI+xdzIqHVY+RxxmsG3+IEjkviG65mSYOhNxcyN6gCZ6TecukMdmZVpVvhu6fk5qCzeXOCeZtOFHlU9orpKug0stJj4MeEaJsfUVEfG8Uqojl785mR2SAkrHCxP+QLR+oA0HCocIQQcVVP3ugqtbh2vWJOaGnfy8GHJxhBrLATAgFhq7JRTmh4i4TOExyOl00eXHOemy/gD8IkWf4f8sE83a6IeU8KqfV6QK7bxpYQM2yin2arTOvs7yqgPvWaKx837f5wdIq0DJ0Bkp/G7s7wdFjTtxbjKmphEayKjULYsy90F52ob5gSeqD7ZBnd6Bh4DBlEVN7taWkA9SoAKBUPxIy/TaknSd91+u224XMRd+huu8eCQ1/G+/13wubz5EnxAzlI=
+  skip_existing: true

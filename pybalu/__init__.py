@@ -10,4 +10,4 @@ from . import misc
 from . import performance_eval
 from . import utils
 
-__version__ = '0.1.5'
+__version__ = '0.2.0'
