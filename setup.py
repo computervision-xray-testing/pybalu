@@ -72,6 +72,8 @@ import sys
 if sys.version_info < (3, 6):
     sys.exit('Sorry, Python < 3.6 is not supported')
 
+IS_WINDOWS = sys.platform.startswith("win")
+
 import os
 
 from setuptools import setup
@@ -188,11 +190,14 @@ Return value:
     else:
         extPath += ".c"
 
+    libraries = None
+
     if use_math:
         compile_args = list(my_extra_compile_args_math)  # copy
         link_args = list(my_extra_link_args_math)
         # link libm; this is a list of library names without the "lib" prefix
-        libraries = ["m"]
+        if not IS_WINDOWS:
+            libraries = ["m"]
     else:
         compile_args = list(my_extra_compile_args_nonmath)
         link_args = list(my_extra_link_args_nonmath)
