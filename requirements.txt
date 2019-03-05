@@ -1,0 +1,7 @@
+cython
+numpy
+scipy
+matplotlib
+scikit-image
+scikit-learn
+tqdm
