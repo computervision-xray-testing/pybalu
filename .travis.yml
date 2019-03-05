@@ -21,7 +21,7 @@ install:
       brew upgrade python;
     fi
 # Install cibuildwheel using pip3 to make sure Python 3 is used.
-  - pip3 install --upgrade cibuildwheel
+  - pip3 install --user --upgrade cibuildwheel
 # Create file '.cibuildwheel' so that extension build is not optional (c.f. setup.py).
   - touch .cibuildwheel
 
