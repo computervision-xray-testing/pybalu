@@ -2,7 +2,7 @@ env:
   global:
   - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-* *-manylinux1_i686"
   - CIBW_BEFORE_BUILD="python -m pip install -r requirements.txt"
-  - TWINE_USER=mabucchi
+  - TWINE_USERNAME=mabucchi
   - secure: JvT4s6k9r7goUhxxeSwAjPHA/EQVKwYo838a6Ze4wm/SSuG2OLYqU29NTyJnQmJmU7ksF1YT5QK5NWqEvkGTjvmpiixbnVowd4iwcmFLgbu/AG+WxVbk0WW+f1yufjY49nq8RY4VeAhl+Rt10m1blbzFjUADxXVDVir8ujQzvCUj5rikQndjc3DzJPVZKuNK5NOPfx/K9TXXTgGmCdRGoSHkKbQRCGz/H7AOgxCtsSH3dfRBGgpqhDodMjsPmgWvPntxO74N2L9I/1gH1yYEDKo+k14BkJBdKFy12dUTE1NXjTeqrN1MrrDju94qCBdH1jHnI7CkZyslfmeA3QD4IiRc6YbQQgPqgjg8Db1dnJL0rpwH5A4dn+1Zl/z3IJZuAHUGC+1Rsqtv8O1zdV7b0+9SOdMq9U6VgT3TJs0+qYbZqpFvHD6UidfJMQ2XsQjbNg6r0gABd5TkLrZ6yFRjLDn3+WOCj6wFC9f3Cq5iZrH+kpGpS1Qu2BLPDWjN3IunAsg+NJ26xrInkTA4naS31tSJzppJTdIuICCNIV8HZgZyMs7vt1Z1zLBCSNbHr56TRho7av/uM2USu9CQH7h6CBt9cU5FqFZ31S2CbwEi6AuoA/zgI64J3aUMSFiXVM6RfKm1Qo1hdaej3LbvidBRTZNVrzsYcnRBclaQTYXsYGM=
 matrix:
   include:
