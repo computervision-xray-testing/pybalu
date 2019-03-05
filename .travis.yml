@@ -11,19 +11,14 @@ matrix:
       python: "3.7"
       services:
         - docker
+      install:
+        - pip3 install --upgrade cibuildwheel
+        - touch .cibuildwheel
     - os: osx
-      osx_image: xcode8.3
-
-install:
-# Python 3 is needed to run cibuildwheel for websockets.
-  - if [ "${TRAVIS_OS_NAME:-}" == "osx" ]; then
-      brew update;
-      brew upgrade python;
-    fi
-# Install cibuildwheel using pip3 to make sure Python 3 is used.
-  - pip3 install --user --upgrade cibuildwheel
-# Create file '.cibuildwheel' so that extension build is not optional (c.f. setup.py).
-  - touch .cibuildwheel
+      language: generic
+      install:
+        - sudo pip2 install --upgrade cibuildwheel
+        - touch .cibuildwheel
 
 script:
   - cibuildwheel --output-dir wheelhouse
