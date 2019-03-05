@@ -1,6 +1,6 @@
 __all__ = ["imread", "im2col"]
 
-from matplotlib.pyplot import imread as _imread
+from imageio import imread as _imread
 import numpy as _np
 
 def imread(filename, *, normalize=False, flatten=False):
@@ -35,8 +35,8 @@ def imread(filename, *, normalize=False, flatten=False):
     if flatten:
         img = img @ [0.299, 0.587, 0.114]
     if normalize:
-        return img
-    return (img * 255).astype(_np.uint8)
+        return (img / 255)
+    return img.astype(_np.uint8)
 
 def im2col(image, n, m):
     '''\

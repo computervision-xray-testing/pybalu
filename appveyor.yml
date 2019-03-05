@@ -1,7 +1,7 @@
 environment:
   # only do for Python >= 3.6.
   CIBW_SKIP: "cp27-* cp33-* cp34-* cp35-*"
-  CIBW_BEFORE_BUILD: "python -m pip install ."
+  CIBW_BEFORE_BUILD: "python -m pip install -r requirements.txt"
 
 build_script:
   - pip install cibuildwheel==0.10.1

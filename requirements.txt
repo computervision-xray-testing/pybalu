@@ -1,7 +1,7 @@
 cython
 numpy
 scipy
-matplotlib
+imageio
 scikit-image
 scikit-learn
 tqdm

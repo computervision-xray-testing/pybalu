@@ -348,9 +348,9 @@ setup(
     # See
     #    http://setuptools.readthedocs.io/en/latest/setuptools.html
     #
-    install_requires=["numpy", "scipy", "matplotlib",
+    install_requires=["numpy", "scipy", "imageio",
                       "scikit-image", "scikit-learn", "tqdm"],
-    setup_requires=["cython", "numpy", "scipy", "matplotlib",
+    setup_requires=["cython", "numpy", "scipy", "imageio",
                     "scikit-image", "scikit-learn", "tqdm"],
     python_requires='!=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, <4',
     provides=["pybalu"],

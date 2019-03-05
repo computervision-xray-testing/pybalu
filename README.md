@@ -9,7 +9,7 @@ Python 3.6 or higher is required to run setup and installation, together with th
 - cython
 - numpy
 - scipy
-- matplotlib
+- imageio
 - scikit-image
 - scikit-learn
 - tqdm
