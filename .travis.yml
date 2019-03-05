@@ -2,6 +2,8 @@ env:
   global:
   - CIBW_SKIP="cp27-* cp33-* cp34-* cp35-* *-manylinux1_i686"
   - CIBW_BEFORE_BUILD="python -m pip install -r requirements.txt"
+  - TWINE_USER=mabucchi
+  - secure: JvT4s6k9r7goUhxxeSwAjPHA/EQVKwYo838a6Ze4wm/SSuG2OLYqU29NTyJnQmJmU7ksF1YT5QK5NWqEvkGTjvmpiixbnVowd4iwcmFLgbu/AG+WxVbk0WW+f1yufjY49nq8RY4VeAhl+Rt10m1blbzFjUADxXVDVir8ujQzvCUj5rikQndjc3DzJPVZKuNK5NOPfx/K9TXXTgGmCdRGoSHkKbQRCGz/H7AOgxCtsSH3dfRBGgpqhDodMjsPmgWvPntxO74N2L9I/1gH1yYEDKo+k14BkJBdKFy12dUTE1NXjTeqrN1MrrDju94qCBdH1jHnI7CkZyslfmeA3QD4IiRc6YbQQgPqgjg8Db1dnJL0rpwH5A4dn+1Zl/z3IJZuAHUGC+1Rsqtv8O1zdV7b0+9SOdMq9U6VgT3TJs0+qYbZqpFvHD6UidfJMQ2XsQjbNg6r0gABd5TkLrZ6yFRjLDn3+WOCj6wFC9f3Cq5iZrH+kpGpS1Qu2BLPDWjN3IunAsg+NJ26xrInkTA4naS31tSJzppJTdIuICCNIV8HZgZyMs7vt1Z1zLBCSNbHr56TRho7av/uM2USu9CQH7h6CBt9cU5FqFZ31S2CbwEi6AuoA/zgI64J3aUMSFiXVM6RfKm1Qo1hdaej3LbvidBRTZNVrzsYcnRBclaQTYXsYGM=
 matrix:
   include:
   - language: python
@@ -11,19 +13,14 @@ matrix:
     services:
     - docker
     install:
-    - pip3 install --upgrade cibuildwheel
+    - pip install --upgrade cibuildwheel twine
     - touch .cibuildwheel
   - os: osx
     language: generic
     install:
-    - sudo pip2 install --upgrade cibuildwheel
+    - brew upgrade python
+    - sudo python3 -m pip install --upgrade cibuildwheel twine
     - touch .cibuildwheel
 script:
 - cibuildwheel --output-dir dist
-deploy:
-  provider: pypi
-  server: https://testpypi.python.org/pypi # Remove for deployment to official PyPi repo
-  user: mabucchi
-  password:
-    secure: KYsU0zhPKH0H/mjnURuhfh+uls6/hOtss2vny2T4XB3ji7721FlZQ1FQ8Hgxub8kcfjPZ/2extmBfi4rlLNZu5y4vltLpCXfvU1495g+RY9MI5azfNRrM4TMxzDG/91b06YgfLeVIR/n/4zuNhykOns80UE5U2MJch5oAjrSwkQjosjxdWz7z7PL1Livu4AgRRHULiMzEkCxEKrmfowa5WK1019jBblbrGl8RWamGx9orKf5sRLobuMXcLKxeQyQ2ah7UY1up9///t5GZTUXZP79osDDMghR2R0TigI+xdzIqHVY+RxxmsG3+IEjkviG65mSYOhNxcyN6gCZ6TecukMdmZVpVvhu6fk5qCzeXOCeZtOFHlU9orpKug0stJj4MeEaJsfUVEfG8Uqojl785mR2SAkrHCxP+QLR+oA0HCocIQQcVVP3ugqtbh2vWJOaGnfy8GHJxhBrLATAgFhq7JRTmh4i4TOExyOl00eXHOemy/gD8IkWf4f8sE83a6IeU8KqfV6QK7bxpYQM2yin2arTOvs7yqgPvWaKx837f5wdIq0DJ0Bkp/G7s7wdFjTtxbjKmphEayKjULYsy90F52ob5gSeqD7ZBnd6Bh4DBlEVN7taWkA9SoAKBUPxIy/TaknSd91+u224XMRd+huu8eCQ1/G+/13wubz5EnxAzlI=
-  skip_existing: true
+- twine upload --repository-url https://test.pypi.org/legacy/ --skip-existing dist/*.whl
