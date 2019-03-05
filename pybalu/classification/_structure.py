@@ -19,7 +19,7 @@ def structure(classifier, *, train_data=None, test_data=None, train_classes=None
             - The `fit` method should accept a `train_data` and `train_classes` as input and should train the 
               classifier.
             - The `predict` method should accept `test_data` as input and return a numerical array-like.
-        If an instance of a classifier is given, `initialize` should be set to False.
+        If an instance of a classifier is given, `initialize` parameter should be set to False.
         If a classifier Class is given, then it will be instanced with `classifier_opts` as initializer values.
     train_data: numerical 2 dimensional ndarray, optional
         Corresponds to the training data features. If none are given, it is assumed that the classifier is
