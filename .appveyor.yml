@@ -1,6 +1,7 @@
 branches:
   only:
     - master
+    - dev
 
 environment:
   global:
@@ -18,11 +19,15 @@ install:
 build_script:
   - cibuildwheel --output-dir dist
 
-deploy_script:
-  - python -m pip install twine
-  # Remove for deployment to official PyPi repo
-  - "python -m twine upload --repository-url https://test.pypi.org/legacy/ --skip-existing dist\\*.whl"
-
 artifacts:
   - path: "dist\\*.whl"
     name: Wheels
+
+for:
+  - branches:
+      only:
+        - master
+    deploy_script:
+      - python -m pip install twine
+      # Remove for deployment to official PyPi repo
+      - "python -m twine upload --repository-url https://test.pypi.org/legacy/ --skip-existing dist\\*.whl"
