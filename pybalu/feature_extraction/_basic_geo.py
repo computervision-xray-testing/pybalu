@@ -3,7 +3,7 @@ import scipy.ndimage as img
 # pylint: disable=no-name-in-module
 from ._geometric_c import bbox, convex_area, moments, perimeter
 # pylint: enable=no-name-in-module
-from ._feature_extractor import FeatureExtractorBase
+from pybalu.base import FeatureExtractor
 
 __all__ = ['basic_geo', 'BasicGeoExtractor']
 
@@ -25,6 +25,7 @@ geo_labels = ['center of grav i [px]',
               'Eccentricity',
               'Convex Area [px]',
               'Filled Area [px]']
+
 
 def basic_geo(image, *, show=False, labels=False):
     '''\
@@ -62,14 +63,14 @@ Load an image and get its binary representation, then proceed to get its feature
 
 >>> from pybalu.feature_extraction import basic_geo
 >>> from pybalu.img_processing import segbalu
->>> from pybalu.misc import imread
+>>> from pybalu.io import imread
 >>> img = imread('testimg.png')
 >>> binary_img, _, _ = segbalu(img)
 >>> features = basic_geo(binary_img)
 
 Print a binary image features:
 
->>> from pybalu.IO import print_features
+>>> from pybalu.io import print_features
 >>> labels, features = basic_geo(binary_img, labels=True)
 >>> print_features(labels, features)
 center of grav i [px]   :  51.49202
@@ -99,64 +100,65 @@ Filled Area [px]        :  2506.00000
     I, J = np.where(image.astype(bool))
     i_m = I.mean()
     j_m = J.mean()
-    
+
     # Area
     area = I.size
-    
-    # Perimeter 
+
+    # Perimeter
     L = perimeter(image)
-    
+
     # Roundness
     roundness = 4 * area * np.math.pi / L ** 2 if L > 0 else np.nan
-    
+
     # 'EulerNumber'
     filled_region = img.binary_fill_holes(image)
     _, n_objects = img.label(image)
     _, n_holes = img.label(filled_region - image)
     euler = n_objects - n_holes
-    
+
     # 'FilledArea'
     filled_area = filled_region.sum()
-    
+
     # 'ConvexArea'
     c_area = convex_area(image)
-    
+
     # 'EquivDiameter'
     equiv_diameter = np.math.sqrt(4 * area / np.math.pi)
-    
+
     # 'Solidity'
     solidity = area / c_area if c_area > 0 else np.nan
-    
+
     # Bounding box
     row_slice, col_slice = bbox(image)
     height = row_slice.stop - row_slice.start
     width = col_slice.stop - col_slice.start
     bbox_area = height * width
-    
+
     # 'Extent'
     extent = area / bbox_area if bbox_area > 0 else np.nan
-    
+
     # MajorAxisLength, MinorAxisLength, Orientation and Eccentricity
     if area > 0:
         mu = moments(image, centered=True, order=2)
-        
+
         a = mu[2, 0] / mu[0, 0]
         b = mu[1, 1] / mu[0, 0]
         c = mu[0, 2] / mu[0, 0]
-        
+
         # eigen values of inertia tensor
         l1 = (a + c) / 2 + np.sqrt(4 * b ** 2 + (a - c) ** 2) / 2
         l2 = (a + c) / 2 - np.sqrt(4 * b ** 2 + (a - c) ** 2) / 2
-        
+
         major_axis_len = 4 * np.sqrt(l1)
         minor_axis_len = 4 * np.sqrt(l2)
         eccentricity = 0 if l1 == 0 else np.sqrt(1 - l2 / l1)
-        orientation = .5 if a - c == 0 else np.math.atan2(2 * b, (a - c)) / np.pi
+        orientation = .5 if a - \
+            c == 0 else np.math.atan2(2 * b, (a - c)) / np.pi
         if orientation < 0:
             orientation = (orientation + 1) * 90
         else:
             orientation = (orientation - 1) * 90
-            
+
         # Danielsson shape factor (see Danielsson, 1977)
         td = img.morphology.distance_transform_cdt(image)
         dm = td[image.astype(bool)].mean()
@@ -167,29 +169,35 @@ Filled Area [px]        :  2506.00000
         orientation = np.nan
         eccentricity = np.nan
         danielsson = np.nan
-    
-    geo_features =  np.array([i_m,
-                              j_m,
-                              height,
-                              width,
-                              area,
-                              L,
-                              roundness,
-                              danielsson,
-                              euler,
-                              equiv_diameter,
-                              major_axis_len,
-                              minor_axis_len,
-                              orientation,
-                              solidity,
-                              extent,
-                              eccentricity,
-                              c_area,
-                              filled_area])
-    
+
+    geo_features = np.array([i_m,
+                             j_m,
+                             height,
+                             width,
+                             area,
+                             L,
+                             roundness,
+                             danielsson,
+                             euler,
+                             equiv_diameter,
+                             major_axis_len,
+                             minor_axis_len,
+                             orientation,
+                             solidity,
+                             extent,
+                             eccentricity,
+                             c_area,
+                             filled_area])
+
     if labels:
         return np.array(geo_labels), geo_features
     return geo_features
 
-class BasicGeoExtractor(FeatureExtractorBase):
-    extractor_func = basic_geo
+
+class BasicGeoExtractor(FeatureExtractor):
+
+    def transform(self, X):
+        return np.array([basic_geo(x) for x in self._get_iterator(X)])
+
+    def get_labels(self):
+        return np.array(geo_labels)

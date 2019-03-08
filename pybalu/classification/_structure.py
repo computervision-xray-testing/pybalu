@@ -2,6 +2,7 @@ __all__ = ["structure"]
 
 import numpy as np
 
+
 def structure(classifier, *, train_data=None, test_data=None, train_classes=None, initialize=True,
               fit_method='fit', predict_method='predict', classifier_opts=None):
     '''\
@@ -57,7 +58,9 @@ def structure(classifier, *, train_data=None, test_data=None, train_classes=None
     '''
 
     if not hasattr(classifier, fit_method) or not hasattr(classifier, predict_method):
-        raise ValueError("`classifier` must define methods `fit` and `predict` in order to be considered a valid classifier")
+        raise ValueError(
+            f"`classifier` must define methods `{fit_method}` and `{predict_method}` in order to be considered a valid classifier"
+        )
 
     classifier_opts = classifier_opts or dict()
 
@@ -68,13 +71,15 @@ def structure(classifier, *, train_data=None, test_data=None, train_classes=None
 
     if train_data is not None:
         if train_classes is None:
-            raise ValueError("`train_features` given but no `classification` given to train classifier")
-        
+            raise ValueError(
+                "`train_features` given but no `classification` given to train classifier"
+            )
+
         classifier_instance = classifier(**classifier_opts)
         getattr(classifier_instance, fit_method)(train_data, train_classes)
 
     if test_data is not None:
         prediction = getattr(classifier_instance, predict_method)(test_data)
         return np.array(prediction), classifier_instance
-    
+
     return np.empty(0), classifier_instance

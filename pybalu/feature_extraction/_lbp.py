@@ -4,7 +4,7 @@ import numpy as np
 from pybalu.misc import im2col
 from skimage.feature import local_binary_pattern as _lbp
 
-from ._feature_extractor import FeatureExtractorBase
+from pybalu.base import FeatureExtractor
 
 
 def lbp(image, region=None, *, show=False, labels=False, **kwargs):
@@ -32,12 +32,6 @@ def lbp(image, region=None, *, show=False, labels=False, **kwargs):
     norm: bool, optional
         If set to True, the output array is normalized so that the sum of all its features 
         equals 1. Default value is False.
-    integral: bool, optional  
-        ( TODO )
-    max_d: integer, optional
-        ( TODO )
-    weight: integer, optional
-        ( TODO )
     mapping: string, optional
         Reprsents the kind of LBP performed over each block. Options are:
             - 'default': original local binary pattern which is gray scale but not
@@ -86,20 +80,20 @@ def lbp(image, region=None, *, show=False, labels=False, **kwargs):
     hdiv = kwargs.pop('hdiv', None)
     if vdiv is None or hdiv is None:
         raise ValueError('`vdiv` and `hdiv` must be given to lbp.')
-    
+
     if region is None:
-        region = np.ones_like(image)    
-        
+        region = np.ones_like(image)
+
     samples = kwargs.pop('samples', 8)
     normalize = kwargs.pop('norm', False)
     integral = kwargs.pop('integral', False)
     max_d = kwargs.pop('max_d', None)
     if integral and max_d is None:
         raise ValueError('`max_d` must be set if `integral` is set to True.')
-        
+
     weight = kwargs.pop('weight', 0)
     mapping = kwargs.pop('mapping', 'default')
-    
+
     if mapping == 'ror' or mapping == 'default':
         num_patterns = 2 ** samples
     elif mapping == 'uniform':
@@ -109,25 +103,24 @@ def lbp(image, region=None, *, show=False, labels=False, **kwargs):
     else:
         raise ValueError(f"Unknown mapping: '{mapping}'")
 
-    
     radius = kwargs.pop('radius', None)
     if radius is None:
         radius = np.log(samples) / np.log(2) - 1
-        
+
     ret_centers = kwargs.pop('ret_centers', False)
-        
+
     if len(kwargs) > 0:
         unknowns = "'" + "', '".join(kwargs.keys()) + "'"
         raise ValueError(f"Unknown options given to lbp: {unknowns}")
-        
+
     if show:
         print('--- extracting local binary patterns features...')
     label = 'LBP'
-      
+
     # set pixels not within region to 0
     image = image.copy()
     image[~region.astype(bool)] = 0
-    
+
     code_img = _lbp(image, P=samples, R=radius, method=mapping)
     n, m = code_img.shape
     N, M = image.shape
@@ -135,7 +128,7 @@ def lbp(image, region=None, *, show=False, labels=False, **kwargs):
     i1 = round((N - n)/2)
     j1 = round((M - m)/2)
     Ilbp[i1:i1+n, j1:j1+m] = code_img
-    
+
 # TODO:
 #     if integral:
 #         hx = inthist(Ilbp+1, max_d)
@@ -143,39 +136,55 @@ def lbp(image, region=None, *, show=False, labels=False, **kwargs):
     ylen = int(np.ceil(n / vdiv))
     xlen = int(np.ceil(m / hdiv))
     grid_img = im2col(code_img, ylen, xlen) + 1
-    
+
     if weight > 0:
         label = 'W-' + label
         pass
     else:
-        desc = np.vstack([np.histogram(grid_img[:,i], num_patterns)[0] for i in range(grid_img.shape[1])])
+        desc = np.vstack([np.histogram(grid_img[:, i], num_patterns)[0]
+                          for i in range(grid_img.shape[1])])
 
     lbp_feats = desc.ravel()
     N, M = desc.shape
-        
+
     if normalize:
         lbp_feats = lbp_feats / lbp_feats.sum()
-        
+
     if not labels and not ret_centers:
         return lbp_feats
-        
+
     if labels:
         lbp_labels = []
         for i in range(N):
             for j in range(M):
-                lbp_labels.append(f"{label}({i+1},{j+1:>2d}) [{samples},'{mapping}']")
+                lbp_labels.append(
+                    f"{label}({i+1},{j+1:>2d}) [{samples},'{mapping}']")
         ret = np.array(lbp_labels), lbp_feats
     else:
         ret = (lbp_feats,)
-    
+
     if ret_centers:
         dx = 1 / hdiv
         dy = 1 / vdiv
         x = np.linspace(dx / 2, 1 - dx / 2, hdiv)
         y = np.linspace(dy / 2, 1 - dy / 2, vdiv)
         ret = (ret,) + (x, y)
-    
+
     return ret
 
-class LBPExtractor(FeatureExtractorBase):
-    extractor_func = lbp
+
+class LBPExtractor(FeatureExtractor):
+    def __init__(self, *, hdiv=None, vdiv=None, samples=8, norm=False, mapping="default", radius=None):
+        self.hdiv = hdiv
+        self.vdiv = vdiv
+        self.samples = samples
+        self.norm = norm
+        self.mapping = mapping
+        self.radius = radius
+
+    def transform(self, X):
+        params = self.get_params()
+        return np.array([lbp(x, **params) for x in self._get_iterator(X)])
+
+    def get_labels(self):
+        return "LBP"

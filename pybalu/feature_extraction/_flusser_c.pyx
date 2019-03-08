@@ -1,5 +1,3 @@
-__all__ = ['flusser', 'FlusserExtractor']
-
 cimport cython
 cimport numpy as np
 import numpy as np

@@ -4,15 +4,16 @@ import os
 import re
 import collections
 import numpy as np
-from pybalu.misc import imread
+from ._imread import imread
+
 
 class ImageSet:
-    def __init__(self, path, *, extension=None, prefix=None, start=None, stop=None, 
+    def __init__(self, path, *, extension=None, prefix=None, start=None, stop=None,
                  flatten=True,  imloader=None, imloader_opts=None, filenames=None):
-        
+
         if isinstance(path, ImageSet):
             other = path
-            self._directory = other._directory            
+            self._directory = other._directory
             self._file_re = re.compile(other._file_re.pattern)
             self._imloader_opts = dict(other._imloader_opts)
             self._flatten = other._flatten
@@ -39,7 +40,7 @@ class ImageSet:
 
             # TODO: should we warn if the resulting set is empty?
             return
-        
+
         if extension is None:
             extension = '.*?'
         else:
@@ -48,23 +49,24 @@ class ImageSet:
         if prefix is None:
             prefix = ''
 
-        self._directory = path            
+        self._directory = path
         self._file_re = re.compile(fr'{prefix}.*\.{extension}$')
         self._imloader_opts = imloader_opts or dict()
         self._imloader = imloader or imread
         self._flatten = flatten
         if flatten:
             self._dir_filenames = None
-            self._filenames = [os.path.join(dirname, filename) 
-                               for dirname, _, files in os.walk(path) 
-                               for filename in files 
+            self._filenames = [os.path.join(dirname, filename)
+                               for dirname, _, files in os.walk(path)
+                               for filename in files
                                if self._file_re.match(filename)][start: stop]
             self._slice = slice(start or 0, len(self._filenames))
         else:
-            self._dir_filenames = [[os.path.join(dirname, filename) 
+            self._dir_filenames = [[os.path.join(dirname, filename)
                                     for filename in files if self._file_re.match(filename)]
                                    for dirname, _, files in os.walk(path)][start: stop]
-            self._dir_filenames = [dirs for dirs in self._dir_filenames if len(dirs) > 0]                           
+            self._dir_filenames = [
+                dirs for dirs in self._dir_filenames if len(dirs) > 0]
             self._filenames = list(np.hstack(self._dir_filenames))
             self._slice = slice(start or 0, len(self._dir_filenames))
 
@@ -73,22 +75,22 @@ class ImageSet:
 
     def is_flat(self):
         return self._flatten
-        
+
     def __iter__(self):
         return ((filename, self._imloader(filename, **self._imloader_opts)) for filename in self._filenames)
-    
+
     def get_filenames(self):
         return list(self._filenames)
-    
+
     def get_images(self):
         return list(self.iter_images())
-    
+
     def iter_images(self):
         if self._flatten:
             return (self._imloader(filename, **self._imloader_opts) for filename in self._filenames)
         else:
             return (np.array([self._imloader(filename, **self._imloader_opts) for filename in _dir]) for _dir in self._dir_filenames)
-    
+
     def __len__(self):
         if self._flatten:
             return len(self._filenames)
@@ -101,7 +103,6 @@ class ImageSet:
             return (len(self._filenames),)
         else:
             return len(self._dir_filenames), len(self._filenames)
-
 
     def __getitem__(self, obj):
         if isinstance(obj, int):
@@ -118,9 +119,10 @@ class ImageSet:
             return ImageSet(self, filenames=filenames)
         else:
             raise TypeError(f"Expected a slice or an int, not {type(obj)}")
-    
+
     def __repr__(self):
-        attrs = [f"path='{self._directory}'", f"pattern='{self._file_re.pattern}'"]
+        attrs = [f"path='{self._directory}'",
+                 f"pattern='{self._file_re.pattern}'"]
         if self._slice.start is not None:
             attrs.append(f'start={self._slice.start}')
         if self._slice.stop is not None:

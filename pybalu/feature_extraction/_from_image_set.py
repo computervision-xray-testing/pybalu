@@ -1,12 +1,15 @@
 __all__ = ['from_image_set']
 
-from ._feature_extractor import FeatureExtractorBase, FeatureExtractionPipeLine, FeatureExtractionMultiplexer
+from pybalu.base import FeatureExtractor
+from sklearn.base import TransformerMixin, clone
+from sklearn.pipeline import Pipeline
 import numpy as np
 import tqdm
 
-def from_image_set(image_set, extractors, show=False):
+
+def from_image_set(image_set, extractor, show=False):
     '''\
-from_image_set(image_set, extractors, show=False)
+from_image_set(image_set, extractor, show=False)
 
 Returns a 2-dimensional array on which each row represents a different image from the given
 image set, and each column a feature extracted by one of the given extractors. 
@@ -16,9 +19,9 @@ Parameters
 image_set : an ImageSet object
     Represents the set of images over which to extract the selected features. All images
     within the set will have their features extracted.
-extractors : a FeatureExtractor collection
-    Contains all the pybalu FeatureExtractors to be used over each image in order to obtain
-    the desired features.
+extractor : an object that implements the sklearn transformer interface
+    Can be any of the extractors and image processors defined by PyBalu. Other useful classes inclue
+    `sklearn.pipeline.Pipeline` and `sklearn.pipeline.FeatureUnion` to combine multiple extractors.
 show : bool, optional
     If set to true, a progress bar that shows the current and estimated completion time will 
     be shown during execution. Default is False.
@@ -37,13 +40,19 @@ Examples
 Extract the basic intensity features and haralick features for distance 3 for all the images
 in a given set
 
->>> from pybalu.IO import ImageSet, print_features
+>>> from pybalu.io import ImageSet, print_features
 >>> from pybalu.feature_extraction import BasicIntExtractor, HaralickExtractor, from_image_set
+>>> from sklearn.pipeline import make_union
+>>> 
 >>> image_set = ImageSet('./images/', extension='.png')
->>> labels, features = from_image_set(image_set, 
-...                                   [BasicIntExtractor(), HaralickExtractor(distance=3)],
-...                                   show=True)
-Extracting Features: 100%|███████████████████████| 1.68k/1.68k [00:25<00:00, 64.9 imgs/s]
+>>> basic_int, haralick = BasicIntExtractor(), HaralickExtractor(distance=3)
+>>> extractors = make_union(basic_int, haralick)
+>>> features = from_image_set(image_set, 
+...                           extractors,
+...                           show=True)
+Extracting Features(basic_int): 100%|███████████████████████| 1.68k/1.68k [00:12<00:00, 138.2 imgs/s]
+Extracting Features(haralick): 100%|███████████████████████| 1.68k/1.68k [00:13<00:00, 129.9 imgs/s]
+>>> labels = np.hstack([basic_int.get_labels(), haralick.get_labels()])
 >>> print_features(labels, features[0])
 Intensity Mean        :  104.13101
 Intensity StdDev      :  22.29537
@@ -80,31 +89,15 @@ Tx 12, d 3  (range)   :  0.50197
 Tx 13, d 3  (range)   :  0.66518
 Tx 14, d 3  (range)   :  1.48388
     '''
-    if len(extractors) == 0:
-        raise Exception('At least one feature extractor must be given')
-        
-    for extractor in extractors:
-        if not isinstance(extractor, (FeatureExtractorBase, FeatureExtractionPipeLine, FeatureExtractionMultiplexer)):
-            raise Exception(f'Uknown extractor of type `{type(extractor)}`')
-    
-    if show:
-        # tqdm iterator is created for displaying progress. The subjacent range is useless, but needed
-        # so that tqdm can update the progress bar properly
-        iterator = zip(tqdm.trange(len(image_set), desc='Extracting Features', unit_scale=True, unit=' imgs'),
-                      image_set.iter_images())
-    else:
-        # so that we can use `iterator` independent of the value of `show`
-        iterator = enumerate(image_set.iter_images()) 
-        
-    features = []    
+    if not isinstance(extractor, (TransformerMixin, Pipeline)):
+        raise TypeError(
+            'extractor object must implement sklearn transformer interface'
+        )
 
-    # as written above: index is ignored, but necesary for tqdm
-    for _, img in iterator:
-        features.append(np.hstack([extractor(img) for extractor in extractors]))
-        
-    # cheap way for obtaining all the feature labels. Should be optimized in the feature 
-    # to avoid an extra call to all extractors
-    img = next(image_set.iter_images())
-    labels = np.hstack([extractor(img, labels=True)[0] for extractor in extractors])
-
-    return labels, np.vstack(features)
+    old_params = extractor.get_params()
+    new_params = dict((k, show) if k.endswith("show") else (k, v)
+                      for k, v in old_params.items())
+    extractor.set_params(new_params)
+    features = extractor.transform(image_set)
+    extractor.set_params(old_params)
+    return features

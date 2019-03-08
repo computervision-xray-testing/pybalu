@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+import ast
+from setuptools.extension import Extension
+from setuptools import setup
+import os
+import sys
 """setuptools-based setup.py template for Cython projects.
 
 Main setup for the library.
@@ -68,16 +73,11 @@ standard_doc_exts = [".md", ".rst", ".txt", ""]
 
 # check for Python 3.6 or later
 # http://stackoverflow.com/questions/19534896/enforcing-python-version-in-setup-py
-import sys
 if sys.version_info < (3, 6):
     sys.exit('Sorry, Python < 3.6 is not supported')
 
 IS_WINDOWS = sys.platform.startswith("win")
 
-import os
-
-from setuptools import setup
-from setuptools.extension import Extension
 
 USE_CYTHON = 'auto'             # True, 'auto' or False
 
@@ -254,7 +254,6 @@ datafiles.append(('.', detected_docs))
 #
 # http://stackoverflow.com/questions/2058802/how-can-i-get-the-version-defined-in-setup-py-setuptools-in-my-package
 #
-import ast
 init_py_path = os.path.join(libname, '__init__.py')
 version = 'ERROR'
 try:
@@ -382,10 +381,9 @@ setup(
               "pybalu.feature_selection",
               "pybalu.feature_transformation",
               "pybalu.img_processing",
-              "pybalu.IO",
+              "pybalu.io",
               "pybalu.misc",
-              "pybalu.performance_eval",
-              "pybalu.utils"],
+              "pybalu.performance_eval"],
 
     # Install also Cython headers so that other Cython modules can cimport ours
     #
@@ -400,7 +398,7 @@ setup(
                   'pybalu.feature_selection': ['*.c'],
                   'pybalu.feature_transformation': ['*.c'],
                   'pybalu.img_processing': ['*.c'],
-                  'pybalu.IO': ['*.c'],
+                  'pybalu.io': ['*.c'],
                   'pybalu.misc': ['*.c'],
                   'pybalu.performance_eval': ['*.c'],
                   'pybalu.utils': ['*.c']},

@@ -1,10 +1,11 @@
 __all__ = ['fourier_des', 'FourierDesExtractor']
 
 import numpy as np
-from ._feature_extractor import FeatureExtractorBase
+from pybalu.base import FeatureExtractor
 # pylint: disable=no-name-in-module
 from ._geometric_c import bw_boundaries
 # pylint: enable=no-name-in-module
+
 
 def fourier_des(image, *, n_des=16, show=False, labels=False):
     '''\
@@ -44,14 +45,14 @@ Load an image and get its binary representation, then proceed to get its feature
 
 >>> from pybalu.feature_extraction import fourier_des
 >>> from pybalu.img_processing import segbalu
->>> from pybalu.misc import imread
+>>> from pybalu.io import imread
 >>> img = imread('testimg.png')
 >>> binary_img, _, _ = segbalu(img)
 >>> features = fourier_des(binary_img)
 
 Print a binary image features:
 
->>> from pybalu.IO import print_features
+>>> from pybalu.io import print_features
 >>> labels, features = fourier_des(binary_img, labels=True)
 >>> print_features(labels, features)
 Fourier-des  1:  0.66428
@@ -75,7 +76,7 @@ Fourier-des 16:  0.05512
         print('--- extracting Fourier descriptors...')
 
     B = bw_boundaries(image)
-    V = B[:,1] + 1j * B[:,0]
+    V = B[:, 1] + 1j * B[:, 0]
     m = B.shape[0]
 
     r = np.zeros(m, dtype=complex)
@@ -86,7 +87,7 @@ Fourier-des 16:  0.05512
 
     r[0] = V[0] - V[m-1]
     r[1:] = V[1:] - V[:m-1]
-    
+
     dl = np.abs(r)
     phi = np.angle(r)
 
@@ -96,15 +97,15 @@ Fourier-des 16:  0.05512
     l[0] = dl[0]
     for k in range(1, m):
         l[k] = l[k-1] + dl[k]
-    
+
     l = l * (2 * np.pi / l[m-1])
     descriptors = np.zeros(n_des)
-    
+
     for n in range(1, n_des + 1):
         an = (dphi * np.sin(l * n)).sum()
         bn = (dphi * np.cos(l * n)).sum()
         an = -an / n / np.pi
-        bn =  bn / n / np.pi
+        bn = bn / n / np.pi
         imagi = an + 1j * bn
         descriptors[n-1] = np.abs(imagi)
 
@@ -112,5 +113,14 @@ Fourier-des 16:  0.05512
         return np.array([f'Fourier-des {n+1:>2d}' for n in range(n_des)]), descriptors
     return descriptors
 
-class FourierDesExtractor(FeatureExtractorBase):
-    extractor_func = fourier_des
+
+class FourierDesExtractor(FeatureExtractor):
+    def __init__(self, *, n_des=16):
+        self.n_des = n_des
+
+    def transform(self, X):
+        params = self.get_params()
+        return np.array([fourier_des(x, **params) for x in self._get_iterator(X)])
+
+    def get_labels(self):
+        return np.array([f'Fourier-des {n+1:>2d}' for n in range(self.n_des)])

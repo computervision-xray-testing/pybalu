@@ -1,6 +1,7 @@
 __all__ = ['flusser', 'FlusserExtractor']
-from ._flusser_c import flusser as _flusser
-from ._feature_extractor import FeatureExtractorBase
+import numpy as np
+from ._flusser_c import flusser as _flusser, f_labels
+from pybalu.base import FeatureExtractor
 
 
 def flusser(image, show=False, labels=False):
@@ -39,14 +40,14 @@ Load an image and get its binary representation, then proceed to get its feature
 
 >>> from pybalu.feature_extraction import flusser
 >>> from pybalu.img_processing import segbalu
->>> from pybalu.misc import imread
+>>> from pybalu.io import imread
 >>> img = imread('testimg.png')
 >>> binary_img, _, _ = segbalu(img)
 >>> features = flusser(binary_img)
 
 Print a binary image features:
 
->>> from pybalu.IO import print_features
+>>> from pybalu.io import print_features
 >>> labels, features = flusser(binary_img, labels=True)
 >>> print_features(labels, features)
 Flusser-moment 1:  0.03429
@@ -56,5 +57,11 @@ Flusser-moment 4:  0.00003
 '''
     return _flusser(image, show=show, labels=labels)
 
-class FlusserExtractor(FeatureExtractorBase):
-    extractor_func = flusser
+
+class FlusserExtractor(FeatureExtractor):
+
+    def transform(self, X):
+        return np.array([flusser(x) for x in self._get_iterator(X)])
+
+    def get_labels(self):
+        return np.array(f_labels)
