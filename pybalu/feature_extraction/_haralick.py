@@ -3,7 +3,7 @@ __all__ = ['haralick', 'HaralickExtractor']
 import numpy as np
 from collections import Sequence
 
-from ._feature_extractor import FeatureExtractorBase
+from pybalu.base import FeatureExtractor
 # pylint: disable=no-name-in-module
 from ._haralick_utils_c import norm_cooc_mtrx, cooc_features
 # pylint: enable=no-name-in-module
@@ -58,13 +58,13 @@ Load an image and get its grayscale representation, then proceed to get its feat
 for 3 distances:
 
 >>> from pybalu.feature_extraction import haralick
->>> from pybalu.misc import imread
+>>> from pybalu.io import imread
 >>> img = imread('testimg.png')
 >>> features = haralick(img, distance=[3, 4, 5])
 
 Print the haralick features for distance 12:
 
->>> from pybalu.IO import print_features
+>>> from pybalu.io import print_features
 >>> labels, features = haralick(img, distance=12, labels=True)
 >>> print_features(labels, features)
 Tx 1 , d 12 (mean) :  0.43780
@@ -115,8 +115,10 @@ Tx 14, d 12 (range):  0.20168
         feats = np.vstack([cooc_features(P) for P in cooc])
         features.append(np.hstack([feats.mean(0), np.abs(feats).max(0)]))
         if labels:
-            label_list.extend([f"Tx {i:<2d}, d {d:<2d} (mean)" for i in range(1, 15)])
-            label_list.extend([f"Tx {i:<2d}, d {d:<2d} (range)" for i in range(1, 15)])
+            label_list.extend(
+                [f"Tx {i:<2d}, d {d:<2d} (mean)" for i in range(1, 15)])
+            label_list.extend(
+                [f"Tx {i:<2d}, d {d:<2d} (range)" for i in range(1, 15)])
 
     haralick_features = np.hstack(features)
 
@@ -124,5 +126,26 @@ Tx 14, d 12 (range):  0.20168
         return np.array(label_list), haralick_features
     return haralick_features
 
-class HaralickExtractor(FeatureExtractorBase):
-    extractor_func = haralick
+
+class HaralickExtractor(FeatureExtractor):
+    def __init__(self, *, distance=3, show=False):
+        self.show = show
+        self.distance = distance
+
+    def transform(self, X):
+        params = self.get_params()
+        params.update({'show': False})
+        return np.array([haralick(x, **params) for x in self._get_iterator(X, desc='haralick')])
+
+    def get_labels(self):
+        if isinstance(self.distance, Sequence):
+            distance = self.distance
+        else:
+            distance = [self.distance]
+        labels = []
+        for d in distance:
+            labels.extend(
+                [f"Tx {i:<2d}, d {d:<2d} (mean)" for i in range(1, 15)])
+            labels.extend(
+                [f"Tx {i:<2d}, d {d:<2d} (range)" for i in range(1, 15)])
+        return np.array(labels)

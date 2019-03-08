@@ -5,9 +5,8 @@ from . import feature_extraction
 from . import feature_selection
 from . import feature_transformation
 from . import img_processing
-from . import IO
+from . import io
 from . import misc
 from . import performance_eval
-from . import utils
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'

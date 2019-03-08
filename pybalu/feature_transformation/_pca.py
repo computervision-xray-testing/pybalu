@@ -42,7 +42,7 @@ def pca(features, *, n_components=0, energy=0):
     --------
     Reduce a grayscale image to 30 principal components and display together with original
     
-    >>> from pybalu.misc import imread
+    >>> from pybalu.io import imread
     >>> from pybalu.feature_transformation import pca
     >>> import matplotlib.pyplot as plt
     >>> 

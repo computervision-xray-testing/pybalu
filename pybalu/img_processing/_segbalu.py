@@ -1,9 +1,11 @@
 __all__ = ['segbalu', 'SegBaluSegmentator']
 
-from ._image_processor import ImageProcessorBase
+import numpy as np
+from pybalu.base import ImageProcessor
+from skimage.filters import threshold_otsu
 from ._rgb2hcm import rgb2hcm
 from ._morphoreg import morphoreg
-from skimage.filters import threshold_otsu
+
 
 def segbalu(image, p=-.05):
     '''\
@@ -41,5 +43,21 @@ def segbalu(image, p=-.05):
     region, edge = morphoreg(hcm, threshold + p)
     return region, edge, hcm
 
-class SegBaluSegmentator(ImageProcessorBase):
-    processing_func = segbalu
+
+class SegBaluSegmentator(ImageProcessor):
+    def __init__(self, *, p=-.05, returns='all', show=False):
+        self.show = show
+
+        self.p = p
+        self.returns = returns
+        if returns == 'all':
+            self.idx = slice(0, 3)
+        elif returns in ['region', 'edges', 'hcm']:
+            self.idx = ['region', 'edges', 'hcm'].index(returns)
+        else:
+            raise ValueError(
+                f"Invalid value for <returns>: '{returns}'"
+            )
+
+    def transform(self, X):
+        return np.array([segbalu(x, self.p)[self.idx] for x in self._get_iterator(X, desc=f'segbalu_{self.returns}')])

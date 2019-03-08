@@ -1,42 +1,7 @@
-__all__ = ["imread", "im2col"]
+__all__ = ["im2col", "im2row"]
 
-from imageio import imread as _imread
 import numpy as _np
 
-def imread(filename, *, normalize=False, flatten=False):
-    '''\
-    imread(filename, flatten=False)
-
-    Loads an image as a numerical matrix of either 2 or 3 dimensions.
-
-    Parameters
-    ----------
-    filename: string
-        The path of the image to load
-    normalize: boolean, optional
-        If set to true, the return value will be an array with float values between 0 and 1.
-        If set to false, the reurn value will be an array with uint8 values between 0 and 255.
-        default value is True.
-    flatten: boolean, optional
-        If set to true, the return value is a 2 dimensional ndarray with the grayscale
-        representation of the loaded image.
-
-    Returns
-    -------
-    image: ndarray
-        matrix representation of the loaded image, either 2 or 3 dimensional depending on the
-        file and the `flatten` parameter.
-
-    Examples
-    --------
-    (TODO)
-    '''
-    img = _imread(filename)
-    if flatten:
-        img = img @ [0.299, 0.587, 0.114]
-    if normalize:
-        return (img / 255)
-    return img.astype(_np.uint8)
 
 def im2col(image, n, m):
     '''\
@@ -80,7 +45,7 @@ def im2col(image, n, m):
      [ 6 16  9 19]
      [ 2 12  0  0]
      [ 7 17  0  0]]
-    ''' 
+    '''
     image = image.T
     n, m = m, n
     N, M = image.shape
@@ -99,14 +64,16 @@ def im2col(image, n, m):
         _img[:N, :M] = image
     else:
         _img = _np.ascontiguousarray(image)
-        
+
     arr_shape = _np.array(_img.shape)
     block_shape = _np.array([n, m])
     new_shape = tuple(arr_shape // block_shape) + tuple(block_shape)
     new_strides = tuple(_img.strides * block_shape) + _img.strides
-    blocks = _np.lib.stride_tricks.as_strided(_img, shape=new_shape, strides=new_strides)
+    blocks = _np.lib.stride_tricks.as_strided(
+        _img, shape=new_shape, strides=new_strides)
     _n, _m, *_ = new_shape
     return blocks.reshape(_n*_m, -1).T
+
 
 def im2row(image, n, m):
     '''\
@@ -157,14 +124,15 @@ def im2row(image, n, m):
      [ 8  9 12 13]
      [ 9 10 13 14]
      [10 11 14 15]]
-    ''' 
+    '''
     _img = _np.ascontiguousarray(image)
     N, M = _img.shape
     hh = N // (n + 1)
     hw = M // (m + 1)
     vs, hs = _img.strides
-    
+
     new_shape = (n, m, hh*2, hw*2)
     new_strides = (vs * hh, hs * hw, vs, hs)
-    windows = _np.lib.stride_tricks.as_strided(_img, shape=new_shape, strides=new_strides)
+    windows = _np.lib.stride_tricks.as_strided(
+        _img, shape=new_shape, strides=new_strides)
     return windows.reshape(n * m, -1)

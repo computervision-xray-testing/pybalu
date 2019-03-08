@@ -4,7 +4,8 @@ import numpy as np
 from scipy.misc import imresize
 import itertools as it
 
-from ._feature_extractor import FeatureExtractorBase
+from pybalu.base import FeatureExtractor
+
 
 def fourier(image, region=None, *, vresize=64, hresize=64, vfreq=2, hfreq=2, show=False, labels=False):
     '''\
@@ -57,13 +58,13 @@ Examples
 Load an image on its grayscale representation, then proceed to get its features:
 
 >>> from pybalu.feature_extraction import fourier
->>> from pybalu.misc import imread
+>>> from pybalu.io import imread
 >>> img = imread('testimg.png', flatten=True) # to grayscale
 >>> features = fourier(img)
 
 Print a binary image features:
 
->>> from pybalu.IO import print_features
+>>> from pybalu.io import print_features
 >>> labels, features = fourier(img, labels=True)
 >>> print_features(labels, features)
 Fourier Abs (1, 1)      :  6948.20449
@@ -78,10 +79,10 @@ Fourier Ang (2, 2) [rad]:  0.01847
 
     if region is None:
         region = np.ones_like(image)
-    
+
     I = image.astype(float)
     I[region == 0] = 0
-    
+
     v_half = round(vresize / 2) + 1
     h_half = round(hresize / 2) + 1
 
@@ -93,18 +94,37 @@ Fourier Ang (2, 2) [rad]:  0.01847
     img_abs = np.abs(img_fourier)
     img_angle = np.angle(img_fourier)
 
-    F = imresize(img_abs[:v_half, :h_half], (vfreq, hfreq), interp='bicubic', mode='F')
-    A = imresize(img_angle[:v_half, :h_half], (vfreq, hfreq), interp='bicubic', mode='F')
+    F = imresize(img_abs[:v_half, :h_half],
+                 (vfreq, hfreq), interp='bicubic', mode='F')
+    A = imresize(img_angle[:v_half, :h_half],
+                 (vfreq, hfreq), interp='bicubic', mode='F')
 
     features = np.hstack([F.ravel(), A.ravel()]).astype(float)
     if labels:
         fourier_labels = np.zeros(vfreq * hfreq * 2, dtype='<U28')
-        fourier_labels[:vfreq * hfreq] = [f'Fourier Abs ({i}, {j})' for i, j in \
+        fourier_labels[:vfreq * hfreq] = [f'Fourier Abs ({i}, {j})' for i, j in
                                           it.product(range(1, vfreq+1), range(1, hfreq+1))]
-        fourier_labels[vfreq * hfreq:] = [f'Fourier Ang ({i}, {j}) [rad]' for i, j in \
+        fourier_labels[vfreq * hfreq:] = [f'Fourier Ang ({i}, {j}) [rad]' for i, j in
                                           it.product(range(1, vfreq+1), range(1, hfreq+1))]
         return fourier_labels, features
     return features
 
-class FourierExtractor(FeatureExtractorBase):
-    extractor_func = fourier
+
+class FourierExtractor(FeatureExtractor):
+    def __init__(self, *, vresize=64, hresize=64, vfreq=2, hfreq=2):
+        self.vresize = vresize
+        self.hresize = hresize
+        self.vfreq = vfreq
+        self.hfreq = hfreq
+
+    def transform(self, X):
+        params = self.get_params()
+        return np.array([fourier(x, **params) for x in self._get_iterator(X)])
+
+    def get_labels(self):
+        labels = np.zeros(self.vfreq * self.hfreq * 2, dtype='<U28')
+        labels[:self.vfreq * self.hfreq] = [f'Fourier Abs ({i}, {j})' for i, j in
+                                            it.product(range(1, self.vfreq+1), range(1, self.hfreq+1))]
+        labels[self.vfreq * self.hfreq:] = [f'Fourier Ang ({i}, {j}) [rad]' for i, j in
+                                            it.product(range(1, self.vfreq+1), range(1, self.hfreq+1))]
+        return labels

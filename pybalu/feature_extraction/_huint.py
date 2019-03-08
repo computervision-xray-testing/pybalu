@@ -2,7 +2,7 @@ __all__ = ['huint', 'HuIntExtractor']
 
 import numpy as np
 
-from ._feature_extractor import FeatureExtractorBase
+from pybalu.base import FeatureExtractor
 # pylint: disable=no-name-in-module
 from ._geometric_c import moments
 # pylint: enable=no-name-in-module
@@ -15,6 +15,7 @@ hu_labels = ['Hu-moment-int 1',
              'Hu-moment-int 5',
              'Hu-moment-int 6',
              'Hu-moment-int 7']
+
 
 def huint(image, region=None, *, show=False, labels=False):
     '''\
@@ -56,14 +57,14 @@ Load an image and get its binary representation, then proceed to get its feature
 
 >>> from pybalu.feature_extraction import huint
 >>> from pybalu.img_processing import segbalu
->>> from pybalu.misc import imread
+>>> from pybalu.io import imread
 >>> img = imread('testimg.png')
 >>> region, _, _ = segbalu(img)
 >>> features = huint(img, region)
 
 Print a grayscale image features:
 
->>> from pybalu.IO import print_features
+>>> from pybalu.io import print_features
 >>> labels, features = huint(img, labels=True)
 >>> print_features(labels, features)
 Hu-moment-int 1:  0.38161
@@ -89,23 +90,25 @@ Hu-moment-int 7: -0.00000
         area = m[0, 0]
 
     area_sq = area ** 2
-    area_25 = area ** 2.5  
-    
-    n02 = m[0,2] / area_sq
-    n20 = m[2,0] / area_sq
-    n11 = m[1,1] / area_sq
-    n12 = m[1,2] / area_25
-    n21 = m[2,1] / area_25
-    n03 = m[0,3] / area_25
-    n30 = m[3,0] / area_25
-    
+    area_25 = area ** 2.5
+
+    n02 = m[0, 2] / area_sq
+    n20 = m[2, 0] / area_sq
+    n11 = m[1, 1] / area_sq
+    n12 = m[1, 2] / area_25
+    n21 = m[2, 1] / area_25
+    n03 = m[0, 3] / area_25
+    n30 = m[3, 0] / area_25
+
     f1 = n20 + n02
     f2 = (n20-n02)**2 + 4*n11**2
     f3 = (n30-3*n12)**2+(3*n21-n03)**2
     f4 = (n30+n12)**2+(n21+n03)**2
-    f5 = (n30-3*n12)*(n30+n12)*((n30+n12)**2 - 3*(n21+n03)**2) + (3*n21-n03)*(n21+n03)*(3*(n30+n12)**2 - (n21+n03)**2)
+    f5 = (n30-3*n12)*(n30+n12)*((n30+n12)**2 - 3*(n21+n03)**2) + \
+        (3*n21-n03)*(n21+n03)*(3*(n30+n12)**2 - (n21+n03)**2)
     f6 = (n20-n02)*((n30+n12)**2 - (n21+n03)**2) + 4*n11*(n30+n12)*(n21+n03)
-    f7 = (3*n21-n03)*(n30+n12)*((n30+n12)**2 - 3*(n21+n03)**2) - (n30-3*n12)*(n21+n03)*(3*(n30+n12)**2 - (n21+n03)**2)
+    f7 = (3*n21-n03)*(n30+n12)*((n30+n12)**2 - 3*(n21+n03)**2) - \
+        (n30-3*n12)*(n21+n03)*(3*(n30+n12)**2 - (n21+n03)**2)
 
     hu_moments = np.array([f1, f2, f3, f4, f5, f6, f7])
 
@@ -113,5 +116,11 @@ Hu-moment-int 7: -0.00000
         return np.array(hu_labels), hu_moments
     return hu_moments
 
-class HuIntExtractor(FeatureExtractorBase):
-    extractor_func = huint
+
+class HuIntExtractor(FeatureExtractor):
+
+    def transform(self, X):
+        return np.array([huint(x) for x in self._get_iterator(X)])
+
+    def get_labels(self):
+        return np.array(hu_labels)

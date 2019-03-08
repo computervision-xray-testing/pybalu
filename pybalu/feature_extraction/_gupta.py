@@ -2,7 +2,7 @@ __all__ = ['gupta', 'GuptaExtractor']
 
 import numpy as np
 
-from ._feature_extractor import FeatureExtractorBase
+from pybalu.base import FeatureExtractor
 # pylint: disable=no-name-in-module
 from ._geometric_c import bw_perim
 # pylint: enable=no-name-in-module
@@ -10,6 +10,7 @@ from ._geometric_c import bw_perim
 _gupta_labels = ['Gupta-moment 1',
                  'Gupta-moment 2',
                  'Gupta-moment 3']
+
 
 def gupta(image, *, show=False, labels=False):
     '''\
@@ -47,14 +48,14 @@ Load an image and get its binary representation, then proceed to get its feature
 
 >>> from pybalu.feature_extraction import gupta
 >>> from pybalu.img_processing import segbalu
->>> from pybalu.misc import imread
+>>> from pybalu.io import imread
 >>> img = imread('testimg.png')
 >>> binary_img, _, _ = segbalu(img)
 >>> features = gupta(binary_img)
 
 Print a binary image features:
 
->>> from pybalu.IO import print_features
+>>> from pybalu.io import print_features
 >>> labels, features = gupta(binary_img, labels=True)
 >>> print_features(labels, features)
 Gupta-moment 1:  0.41745
@@ -63,7 +64,7 @@ Gupta-moment 3:  2.25704
 '''
     if show:
         print('--- extracting Gupta moments...')
-        
+
     i_perim, j_perim = np.where(bw_perim(image, 4).astype(bool))
     im_perim = i_perim + j_perim * 1j
     ix = i_perim.mean()
@@ -71,7 +72,7 @@ Gupta-moment 3:  2.25704
     centre = ix + jx * 1j
     z = np.abs(im_perim - centre)
     m1 = z.mean()
-    
+
     mur1 = z - m1
     mur2 = mur1 * mur1
     mur3 = mur1 * mur2
@@ -91,5 +92,11 @@ Gupta-moment 3:  2.25704
         return np.array(_gupta_labels), gupta_moments
     return gupta_moments
 
-class GuptaExtractor(FeatureExtractorBase):
-    extractor_func = gupta
+
+class GuptaExtractor(FeatureExtractor):
+
+    def transform(self, X):
+        return np.array([gupta(x) for x in self._get_iterator(X)])
+
+    def get_labels(self):
+        return np.array(_gupta_labels)

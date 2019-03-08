@@ -6,7 +6,7 @@ import scipy.stats
 from pybalu.img_processing import fst_deriv, snd_deriv
 from ._geometric_c import bw_perim
 # pylint: enable=no-name-in-module
-from ._feature_extractor import FeatureExtractorBase
+from pybalu.base import FeatureExtractor
 
 int_labels = ['Intensity Mean',
               'Intensity StdDev',
@@ -14,6 +14,7 @@ int_labels = ['Intensity Mean',
               'Intensity Skewness',
               'Mean Laplacian',
               'Mean Boundary Gradient']
+
 
 def basic_int(image, region=None, *, mask=15, show=False, labels=False):
     '''\
@@ -60,14 +61,14 @@ Load an image on its grayscale representation, then proceed to get its features:
 
 >>> from pybalu.feature_extraction import basic_int
 >>> from pybalu.img_processing import segbalu
->>> from pybalu.misc import imread
+>>> from pybalu.io import imread
 >>> img = imread('testimg.png', flatten=True) # to grayscale
 >>> region, _, _ = segbalu(img)
 >>> features = basic_int(img, region)
 
 Print image features:
 
->>> from pybalu.IO import print_features
+>>> from pybalu.io import print_features
 >>> labels, features = basic_int(img, region, labels=True)
 >>> print_features(labels, features)
 Intensity Mean        :  224.86193
@@ -84,7 +85,7 @@ Mean Boundary Gradient:  48.57239
 
     r_perim = bw_perim(region, 4).astype(bool)
     region = region.astype(bool)
-    
+
     image = image.astype(float)
 
     im1, _, _ = fst_deriv(image, mask=mask)
@@ -103,16 +104,25 @@ Mean Boundary Gradient:  48.57239
     intensity_skewness = scipy.stats.skew(useful_img)
     mean_laplacian = im2[region].mean()
 
-    int_features = np.array([intensity_mean, 
+    int_features = np.array([intensity_mean,
                              intensity_std,
                              intensity_kurtosis,
                              intensity_skewness,
-                             mean_laplacian, 
+                             mean_laplacian,
                              boundary_gradient])
 
     if labels:
         return np.array(int_labels), int_features
     return int_features
 
-class BasicIntExtractor(FeatureExtractorBase):
-    extractor_func = basic_int
+
+class BasicIntExtractor(FeatureExtractor):
+    def __init__(self, *, mask=15):
+        self.mask = mask
+
+    def transform(self, X):
+        params = self.get_params()
+        return np.array([basic_int(x, **params) for x in self._get_iterator(X)])
+
+    def get_labels(self):
+        return np.array(int_labels)
