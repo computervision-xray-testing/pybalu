@@ -26,12 +26,6 @@ matrix:
         - sudo python3 -m pip install --upgrade cibuildwheel twine
         - touch .cibuildwheel
 
-jobs:
-  include:
-    - stage: build
-      script:
-        - cibuildwheel --output-dir dist
-    - stage: deploy
-      if: branch = master
-      script:
-        - twine upload --repository-url https://test.pypi.org/legacy/ --skip-existing dist/*.whl
+script:
+  - cibuildwheel --output-dir dist
+  - if [ $TRAVIS_BRANCH = 'master' ]; twine upload --repository-url https://test.pypi.org/legacy/ --skip-existing dist/*.whl; fi
