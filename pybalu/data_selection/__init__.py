@@ -1,1 +1,3 @@
-from ._stratify import *
+from .stratify import stratify
+
+__all__ = ["stratify"]

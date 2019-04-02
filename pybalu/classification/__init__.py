@@ -1,2 +1,3 @@
-from ._structure import *
-# from ._construct import *
+from .structure import structure
+
+__all__ = ["structure"]

@@ -277,13 +277,13 @@ except FileNotFoundError:
 #
 # ext_module_feature_analysis = declare_cython_extension( "pybalu.feature_analysis", use_math=True, include_dirs=my_include_dirs)
 ext_module_fex_flusser = declare_cython_extension(
-    "pybalu.feature_extraction._flusser_c", use_math=True, include_dirs=my_include_dirs)
+    "pybalu.feature_extraction.flusser_utils", use_math=True, include_dirs=my_include_dirs)
 ext_module_fex_geometric = declare_cython_extension(
-    "pybalu.feature_extraction._geometric_c", use_math=True, include_dirs=my_include_dirs)
+    "pybalu.feature_extraction.geometric_utils", use_math=True, include_dirs=my_include_dirs)
 ext_module_fex_haralick = declare_cython_extension(
-    "pybalu.feature_extraction._haralick_utils_c", use_math=True, include_dirs=my_include_dirs)
+    "pybalu.feature_extraction.haralick_utils", use_math=True, include_dirs=my_include_dirs)
 ext_module_fex_hog = declare_cython_extension(
-    "pybalu.feature_extraction._hog_utils_c", use_math=True, include_dirs=my_include_dirs)
+    "pybalu.feature_extraction.hog_utils", use_math=True, include_dirs=my_include_dirs)
 
 # this is mainly to allow a manual logical ordering of the declared modules
 #

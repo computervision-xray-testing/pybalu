@@ -1,12 +1,14 @@
-from . import classification
-from . import data_selection
-from . import feature_analysis
-from . import feature_extraction
-from . import feature_selection
-from . import feature_transformation
-from . import img_processing
-from . import io
-from . import misc
-from . import performance_eval
+# modules
 
-__version__ = '0.2.1'
+__all__ = ["classification",
+           "data_selection",
+           "feature_analysis",
+           "feature_extraction",
+           "feature_selection",
+           "feature_transformation",
+           "img_processing",
+           "io",
+           "misc",
+           "performance_eval"]
+
+__version__ = '0.2.2'
