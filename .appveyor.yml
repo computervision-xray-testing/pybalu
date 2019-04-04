@@ -29,5 +29,4 @@ for:
         - master
     deploy_script:
       - python -m pip install twine
-      # Remove for deployment to official PyPi repo
-      - "python -m twine upload --repository-url https://test.pypi.org/legacy/ --skip-existing dist\\*.whl"
+      - "python -m twine upload --skip-existing dist\\*.whl"

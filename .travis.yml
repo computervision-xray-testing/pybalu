@@ -30,5 +30,5 @@ script:
   - cibuildwheel --output-dir dist
   - |
     if [ "$TRAVIS_BRANCH" == "master" ]; then 
-      twine upload --repository-url https://test.pypi.org/legacy/ --skip-existing dist/*.whl
+      twine upload --skip-existing dist/*.whl
     fi
