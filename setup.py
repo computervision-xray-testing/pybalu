@@ -352,10 +352,23 @@ setup(
     # See
     #    http://setuptools.readthedocs.io/en/latest/setuptools.html
     #
-    install_requires=["numpy", "scipy", "imageio",
-                      "scikit-image", "scikit-learn", "tqdm"],
-    setup_requires=["cython", "numpy", "scipy", "imageio",
-                    "scikit-image", "scikit-learn", "tqdm"],
+    install_requires=[
+        "numpy>=1.16.1",
+        "scipy>=1.1.0",
+        "imageio>=2.5.0",
+        "scikit-image>=0.14.2",
+        "scikit-learn>=0.20.2",
+        "tqdm>=4.29.1"
+    ],
+    setup_requires=[
+        "cython>=0.29.6",
+        "numpy>=1.16.1",
+        "scipy>=1.1.0",
+        "imageio>=2.5.0",
+        "scikit-image>=0.14.2",
+        "scikit-learn>=0.20.2",
+        "tqdm>=4.29.1"
+    ],
     python_requires='!=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, <4',
     provides=["pybalu"],
 
