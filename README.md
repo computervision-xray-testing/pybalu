@@ -7,12 +7,7 @@ Python implementation for Balu, a computer vision, pattern recognition and image
 
 ## Installing pybalu
 
-Python 3.6 or higher is required to use this package. In order to install, first you must install all pybalu dependencies:
-```bash
-$ pip install --upgrade numpy scipy imageio scikit-image scikit-learn tqdm
-```
-
-Finally, to install pybalu, simply run
+Python 3.6 or higher is required to use this package. In order to install pybalu, simply run
 
 ```bash
 $ pip install pybalu
