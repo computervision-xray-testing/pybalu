@@ -15,7 +15,7 @@ $ pip install --upgrade numpy scipy imageio scikit-image scikit-learn tqdm
 Finally, to install pybalu, simply run
 
 ```bash
-$ pip install --index-url https://test.pypi.org/simple/ pybalu
+$ pip install pybalu
 ```
 
 ## Development and contributing
