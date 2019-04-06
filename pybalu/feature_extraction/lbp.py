@@ -26,6 +26,10 @@ def lbp_features(image, region=None, *, show=False, labels=False, **kwargs):
         Number of horizontal divisions to perform on image.
     vdiv: positive integer
         Number of vertical divisions to perform on image.
+    xlen: positive integer
+        Number of horizontal pixels in LBP pattern to sweep image.
+    ylen: positive integer
+        Number of vertical pixels in LBP pattern to sweep image.
     samples: positive integer, optional
         Number of circularly symmetric neighbour set points (quantization of the angular space).
         default value is 8 (all neighbours in 2d)
@@ -78,8 +82,15 @@ def lbp_features(image, region=None, *, show=False, labels=False, **kwargs):
     '''
     vdiv = kwargs.pop('vdiv', None)
     hdiv = kwargs.pop('hdiv', None)
-    if vdiv is None or hdiv is None:
-        raise ValueError('`vdiv` and `hdiv` must be given to lbp.')
+    ylen = kwargs.pop('ylen', None)
+    xlen = kwargs.pop('xlen', None)
+    
+    if (vdiv is None or hdiv is None):
+        if (xlen is None or ylen is None):
+            raise ValueError('`vdiv` and `hdiv` or `xlen` and `ylen` must be given to lbp.')
+    else:
+        if (xlen is not None or ylen is not None):
+            raise ValueError('Only one pair of divisions ([`vdiv`, `hdiv`] or [`xlen`, `ylen`]) mus be given to lbp.')
 
     if region is None:
         region = np.ones_like(image)
@@ -133,8 +144,10 @@ def lbp_features(image, region=None, *, show=False, labels=False, **kwargs):
 #     if integral:
 #         hx = inthist(Ilbp+1, max_d)
 
-    ylen = int(np.ceil(n / vdiv))
-    xlen = int(np.ceil(m / hdiv))
+    if (vdiv is not None):
+        ylen = int(np.ceil(n / vdiv))
+    if (hdiv is not None):
+        xlen = int(np.ceil(m / hdiv))
     grid_img = im2col(code_img, ylen, xlen) + 1
 
     if weight > 0:
