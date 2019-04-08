@@ -8,11 +8,6 @@ __all__ = ['score']
 
 
 def score(features, classification, *, method='fisher', param=None):
-    if param is None:
-        dn = classification.max() - classification.min() + 1  # number of classes
-        p = np.ones((dn, 1)) / dn
-    else:
-        p = param
 
     if method == 'mi':  # mutual information
         raise NotImplementedError()
@@ -27,7 +22,7 @@ def score(features, classification, *, method='fisher', param=None):
 
     # fisher
     elif method == 'fisher':
-        return jfisher(features, classification, p)
+        return jfisher(features, classification)
 
     elif method == 'sp100':
         return sp100(features, classification)
