@@ -12,7 +12,8 @@ environment:
     TWINE_USERNAME: mabucchi
     TWINE_PASSWORD:
       secure: ffBVdW93F+PhTrof4BvLYw==
-  matrtix:
+
+  matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       APPVEYOR_JOB_NAME: "python37-x64-vs2015"
 
