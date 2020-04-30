@@ -12,12 +12,18 @@ environment:
     TWINE_USERNAME: mabucchi
     TWINE_PASSWORD:
       secure: ffBVdW93F+PhTrof4BvLYw==
+  matrtix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      APPVEYOR_JOB_NAME: "python37-x64-vs2015"
 
-install:
-  - python -m pip install cibuildwheel==0.10.1
+stack: python 3.7
 
-build_script:
-  - cibuildwheel --output-dir dist
+init:
+  - cmd: set PATH=C:\Python37;C:\Python37\Scripts;%PATH%
+
+install: python -m pip install cibuildwheel==1.3.0
+
+build_script: python -m cibuildwheel --output-dir dist
 
 artifacts:
   - path: "dist\\*.whl"
