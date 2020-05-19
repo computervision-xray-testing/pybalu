@@ -1,7 +1,7 @@
 __all__ = ['fourier_features', 'FourierExtractor']
 
 import numpy as np
-from scipy.misc import imresize
+from skimage.transform import resize
 import itertools as it
 
 from pybalu.base import FeatureExtractor
@@ -89,14 +89,14 @@ Fourier Ang (2, 2) [rad]:  0.01847
     if show:
         print('--- extracting Fourier features...')
 
-    img_resize = imresize(I, (vresize, hresize), interp='bicubic', mode='F')
+    img_resize = resize(I, (vresize, hresize), interp='bicubic', mode='F')
     img_fourier = np.fft.fft2(img_resize)
     img_abs = np.abs(img_fourier)
     img_angle = np.angle(img_fourier)
 
-    F = imresize(img_abs[:v_half, :h_half],
+    F = resize(img_abs[:v_half, :h_half],
                  (vfreq, hfreq), interp='bicubic', mode='F')
-    A = imresize(img_angle[:v_half, :h_half],
+    A = resize(img_angle[:v_half, :h_half],
                  (vfreq, hfreq), interp='bicubic', mode='F')
 
     features = np.hstack([F.ravel(), A.ravel()]).astype(float)
