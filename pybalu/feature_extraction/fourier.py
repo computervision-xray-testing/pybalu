@@ -33,7 +33,7 @@ hfreq: int, optional
 show : bool, optional
     Wether to print or not messages during execution
 labels : bool, optional
-    Wether to return a second array that contains the label of each value. 
+    Wether to return a second array that contains the label of each value.
 
 Returns
 -------
@@ -89,15 +89,13 @@ Fourier Ang (2, 2) [rad]:  0.01847
     if show:
         print('--- extracting Fourier features...')
 
-    img_resize = resize(I, (vresize, hresize), interp='bicubic', mode='F')
+    img_resize = resize(I, (vresize, hresize))
     img_fourier = np.fft.fft2(img_resize)
     img_abs = np.abs(img_fourier)
     img_angle = np.angle(img_fourier)
 
-    F = resize(img_abs[:v_half, :h_half],
-                 (vfreq, hfreq), interp='bicubic', mode='F')
-    A = resize(img_angle[:v_half, :h_half],
-                 (vfreq, hfreq), interp='bicubic', mode='F')
+    F = resize(img_abs[:v_half, :h_half], (vfreq, hfreq))
+    A = resize(img_angle[:v_half, :h_half], (vfreq, hfreq))
 
     features = np.hstack([F.ravel(), A.ravel()]).astype(float)
     if labels:
