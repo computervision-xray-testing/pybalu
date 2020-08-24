@@ -1,15 +1,15 @@
 name: Build and upload to PyPI
 
-# Build on every branch push, tag push, and pull request change:
 on: 
-  # Trigger the workflow on push or pull request,
-  # but only for the master branch
   push:
     branches:
       - master
   pull_request:
     branches:
       - master
+  release:
+    types:
+      - published
 
 jobs:
   build_wheels:
@@ -60,8 +60,7 @@ jobs:
   upload_pypi:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    # upload to PyPI on every tag starting with 'v'
-    if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/v')
+    if: github.event_name == 'release' && github.event.action == 'published'
     steps:
       - uses: actions/download-artifact@v2
         with:
