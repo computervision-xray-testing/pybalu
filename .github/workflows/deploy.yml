@@ -20,7 +20,7 @@ jobs:
         os: [ubuntu-18.04, windows-latest, macos-latest]
     env: 
       CIBW_BUILD: "cp3?-*"
-      CIBW_SKIP: "cp33-* cp34-* cp35-*"
+      CIBW_SKIP: "cp33-* cp34-* cp35-* *-manylinux_i686"
       CIBW_BEFORE_BUILD: "python -m pip install -r requirements.txt"
     steps:
       - uses: actions/checkout@v2
