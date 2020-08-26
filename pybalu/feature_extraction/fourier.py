@@ -1,8 +1,8 @@
 __all__ = ['fourier_features', 'FourierExtractor']
 
 import numpy as np
-from scipy.misc import imresize
 import itertools as it
+from PIL import Image
 
 from pybalu.base import FeatureExtractor
 
@@ -89,15 +89,13 @@ Fourier Ang (2, 2) [rad]:  0.01847
     if show:
         print('--- extracting Fourier features...')
 
-    img_resize = imresize(I, (vresize, hresize), interp='bicubic', mode='F')
+    img_resize = _imresize(I, (vresize, hresize))
     img_fourier = np.fft.fft2(img_resize)
     img_abs = np.abs(img_fourier)
     img_angle = np.angle(img_fourier)
 
-    F = imresize(img_abs[:v_half, :h_half],
-                 (vfreq, hfreq), interp='bicubic', mode='F')
-    A = imresize(img_angle[:v_half, :h_half],
-                 (vfreq, hfreq), interp='bicubic', mode='F')
+    F = _imresize(img_abs[:v_half, :h_half], (vfreq, hfreq))
+    A = _imresize(img_angle[:v_half, :h_half], (vfreq, hfreq))
 
     features = np.hstack([F.ravel(), A.ravel()]).astype(float)
     if labels:
@@ -108,6 +106,11 @@ Fourier Ang (2, 2) [rad]:  0.01847
                                           it.product(range(1, vfreq+1), range(1, hfreq+1))]
         return fourier_labels, features
     return features
+
+
+def _imresize(arr, size):
+    """Used to keep compatibility with deprecated scipy function `imresize`"""
+    return np.array(Image.fromarray(arr).resize(size))
 
 
 class FourierExtractor(FeatureExtractor):

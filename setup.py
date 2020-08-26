@@ -356,8 +356,9 @@ setup(
         "numpy>=1.16.1",
         "scipy>=1.1.0",
         "imageio>=2.5.0",
-        "scikit-image>=0.14.2",
-        "scikit-learn>=0.20.2",
+        "Pillow>=7.2.0",
+        "scikit-image>=0.17.2",
+        "scikit-learn>=0.22.2",
         "tqdm>=4.29.1"
     ],
     setup_requires=[
@@ -365,8 +366,9 @@ setup(
         "numpy>=1.16.1",
         "scipy>=1.1.0",
         "imageio>=2.5.0",
-        "scikit-image>=0.14.2",
-        "scikit-learn>=0.20.2",
+        "Pillow>=7.2.0",
+        "scikit-image>=0.17.2",
+        "scikit-learn>=0.22.2",
         "tqdm>=4.29.1"
     ],
     python_requires='!=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, <4',

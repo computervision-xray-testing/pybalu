@@ -18,7 +18,7 @@ def imread(filename, *, normalize=False, flatten=False):
     normalize: boolean, optional
         If set to true, the return value will be an array with float values between 0 and 1.
         If set to false, the reurn value will be an array with uint8 values between 0 and 255.
-        default value is True.
+        default value is False.
     flatten: boolean, optional
         If set to true, the return value is a 2 dimensional ndarray with the grayscale
         representation of the loaded image.
