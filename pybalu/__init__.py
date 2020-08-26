@@ -11,4 +11,4 @@ __all__ = ["classification",
            "misc",
            "performance_eval"]
 
-__version__ = '0.2.8'
+__version__ = '0.2.9'
