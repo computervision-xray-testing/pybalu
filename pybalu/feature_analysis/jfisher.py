@@ -5,12 +5,11 @@ import numpy as np
 def jfisher(features, classification, p=None): 
     m = features.shape[1]
     
-    norm = classification.ravel() - classification.min()
-    max_class = norm.max() + 1
-    
     if p is None:
-        p = np.ones(shape=(max_class, 1)) / max_class
-        
+        classes = np.unique(classification)
+        size = classes.shape[0]
+        p = np.ones(shape=(size, 1)) / size
+    
     # Centroid of all samples
     features_mean = features.mean(0)
 
@@ -20,8 +19,8 @@ def jfisher(features, classification, p=None):
     # covariance between classes
     cov_b = np.zeros(shape=(m, m))
 
-    for k in range(max_class):
-        ii = (norm == k)                                   # indices from class k
+    for k in range(size):
+        ii = (classification.ravel() == classes[k])        # indices from class k
         class_features = features[ii,:]                    # samples of class k
         class_mean = class_features.mean(0)                # centroid of class k 
         class_cov = np.cov(class_features, rowvar=False)   # covariance of class k
