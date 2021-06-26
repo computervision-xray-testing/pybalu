@@ -50,8 +50,9 @@ def norm_cooc_mtrx(np.ndarray I, np.ndarray[np.int_t, ndim=2] R, int d):
                 co_occ[3, v1, v2] += 1
                 co_occ[3, v2, v1] += 1
                 tot[3] += 2
-    return co_occ / tot.reshape(4, 1, 1)
-    
+    co_occ_norm = co_occ / tot.reshape(4, 1, 1)
+    co_occ_norm[np.isnan(co_occ_norm)] = 0.0
+    return co_occ_norm
 
 @cython.wraparound(False)
 @cython.boundscheck(False)
