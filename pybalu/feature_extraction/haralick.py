@@ -1,8 +1,7 @@
 __all__ = ['haralick_features', 'HaralickExtractor']
 
 import numpy as np
-from collections import Sequence
-
+from collections.abc import Sequence
 from pybalu.base import FeatureExtractor
 # pylint: disable=no-name-in-module
 from .haralick_utils import norm_cooc_mtrx, cooc_features
