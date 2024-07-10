@@ -1,4 +1,4 @@
-__all__ = ['imread']
+__all__ = ["imread"]
 
 
 import numpy as _np
@@ -6,7 +6,7 @@ from imageio import imread as _imread
 
 
 def imread(filename, *, normalize=False, flatten=False):
-    '''\
+	"""\
     imread(filename, flatten=False)
 
     Loads an image as a numerical matrix of either 2 or 3 dimensions.
@@ -32,10 +32,10 @@ def imread(filename, *, normalize=False, flatten=False):
     Examples
     --------
     (TODO)
-    '''
-    img = _imread(filename)
-    if flatten:
-        img = img @ [0.299, 0.587, 0.114]
-    if normalize:
-        return (img / 255)
-    return img.astype(_np.uint8)
+    """
+	img = _imread(filename)
+	if flatten:
+		img = img @ [0.299, 0.587, 0.114]
+	if normalize:
+		return img / 255
+	return img.astype(_np.uint8)

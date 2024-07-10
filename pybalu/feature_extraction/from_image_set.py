@@ -1,14 +1,11 @@
-__all__ = ['from_image_set']
+__all__ = ["from_image_set"]
 
-from pybalu.base import FeatureExtractor
-from sklearn.base import TransformerMixin, clone
+from sklearn.base import TransformerMixin
 from sklearn.pipeline import Pipeline
-import numpy as np
-import tqdm
 
 
 def from_image_set(image_set, extractor, show=False):
-    '''\
+	"""\
 from_image_set(image_set, extractor, show=False)
 
 Returns a 2-dimensional array on which each row represents a different image from the given
@@ -88,16 +85,13 @@ Tx 11, d 3  (range)   :  0.79496
 Tx 12, d 3  (range)   :  0.50197
 Tx 13, d 3  (range)   :  0.66518
 Tx 14, d 3  (range)   :  1.48388
-    '''
-    if not isinstance(extractor, (TransformerMixin, Pipeline)):
-        raise TypeError(
-            'extractor object must implement sklearn transformer interface'
-        )
+    """
+	if not isinstance(extractor, (TransformerMixin, Pipeline)):
+		raise TypeError("extractor object must implement sklearn transformer interface")
 
-    old_params = extractor.get_params()
-    new_params = dict((k, show) if k.endswith("show") else (k, v)
-                      for k, v in old_params.items())
-    extractor.set_params(new_params)
-    features = extractor.transform(image_set)
-    extractor.set_params(old_params)
-    return features
+	old_params = extractor.get_params()
+	new_params = dict((k, show) if k.endswith("show") else (k, v) for k, v in old_params.items())
+	extractor.set_params(new_params)
+	features = extractor.transform(image_set)
+	extractor.set_params(old_params)
+	return features

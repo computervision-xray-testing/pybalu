@@ -1,13 +1,15 @@
-__all__ = ['perimeter', 'moments', 'convex_area', 'bbox', 'bw_perim']
+__all__ = ["perimeter", "bw_perim", "moments", "bbox", "convex_area"]
+
 
 cimport cython
-cimport numpy as np
+cimport numpy as cnp
 import numpy as np
 import scipy.spatial
 
+
 @cython.wraparound(False)
 @cython.boundscheck(False)
-cpdef float perimeter(np.ndarray[np.int_t, ndim=2] region):
+cpdef float perimeter(cnp.ndarray[cnp.int64_t, ndim=2] region):
 
     cdef int h = region.shape[0]
     cdef int w = region.shape[1]
@@ -36,16 +38,17 @@ cpdef float perimeter(np.ndarray[np.int_t, ndim=2] region):
                 continue
     return p
 
+
 @cython.wraparound(False)
 @cython.boundscheck(False)
-cpdef np.ndarray[np.int_t, ndim=2] bw_perim(np.ndarray[np.int_t, ndim=2] region, int conn=4):
+cpdef cnp.ndarray[cnp.int64_t, ndim=2] bw_perim(cnp.ndarray[cnp.int64_t, ndim=2] region, int conn=4):
     if not (conn == 4 or conn == 8):
         raise Exception('Neighbourhood connectivity must be either 4 or 8, not ' + str(conn))
     
     cdef int h = region.shape[0]
     cdef int w = region.shape[1]
 
-    cdef np.ndarray[np.int_t, ndim=2] out = np.zeros(shape=(h, w), dtype=int)
+    cdef cnp.ndarray[cnp.int64_t, ndim=2] out = np.zeros(shape=(h, w), dtype=int)
     
     cdef int i, j
     
@@ -72,9 +75,9 @@ cpdef np.ndarray[np.int_t, ndim=2] bw_perim(np.ndarray[np.int_t, ndim=2] region,
 
 @cython.wraparound(False)
 @cython.boundscheck(False)
-def moments(np.ndarray[np.int_t, ndim=2] region, centered=False, order=3):
+def moments(cnp.ndarray[cnp.int64_t, ndim=2] region, centered=False, order=3):
     cdef int i, j
-    cdef np.ndarray[np.double_t, ndim=2] m, I_, J_
+    cdef cnp.ndarray[cnp.double_t, ndim=2] m, I_, J_
     
     I, J = np.where(region == 1)
     I_ = np.ones((order+1, I.size))
@@ -99,7 +102,7 @@ def moments(np.ndarray[np.int_t, ndim=2] region, centered=False, order=3):
 
 @cython.wraparound(False)
 @cython.boundscheck(False)
-cpdef bbox(np.ndarray[np.int_t, ndim=2] region):
+cpdef bbox(cnp.ndarray[cnp.int64_t, ndim=2] region):
     
     cdef int n, m, i, j, min_i, max_i, min_j, max_j
     
@@ -120,10 +123,10 @@ cpdef bbox(np.ndarray[np.int_t, ndim=2] region):
 
 @cython.wraparound(False)
 @cython.boundscheck(False)
-def convex_area(np.ndarray[np.int_t, ndim=2] region):
-    cdef np.ndarray[np.int_t, ndim=1] ii, jj
-    cdef np.ndarray[np.double_t, ndim=1] X, Y
-    cdef np.ndarray[np.double_t, ndim=2] dx, dy
+def convex_area(cnp.ndarray[cnp.int64_t, ndim=2] region):
+    cdef cnp.ndarray[cnp.int64_t, ndim=1] ii, jj
+    cdef cnp.ndarray[cnp.double_t, ndim=1] X, Y
+    cdef cnp.ndarray[cnp.double_t, ndim=2] dx, dy
     cdef list hull
     cdef int i, p, q, N
     cdef float val
@@ -162,6 +165,7 @@ def convex_area(np.ndarray[np.int_t, ndim=2] region):
     N = X.size
     return (X[:N-1] @ Y[1:] - X[1:] @ Y[:N-1]) / 2
 
+
 @cython.wraparound(False)
 @cython.boundscheck(False)
 cdef inline tuple nnext_cw(tuple curr, tuple _from):
@@ -185,13 +189,14 @@ cdef inline tuple nnext_cw(tuple curr, tuple _from):
         return ci, j
     return i, cj
 
+
 @cython.wraparound(False)
 @cython.boundscheck(False)
-cpdef bw_boundaries(np.ndarray[np.int_t, ndim=2] R):
+cpdef bw_boundaries(cnp.ndarray[cnp.int64_t, ndim=2] R):
     cdef tuple s, b, p, c
     cdef Py_ssize_t i, j, N, M
     cdef list B
-    cdef np.ndarray[np.int_t, ndim=2] _R
+    cdef cnp.ndarray[cnp.int64_t, ndim=2] _R
 
     N = R.shape[0]
     M = R.shape[1]

@@ -1,16 +1,18 @@
-__all__ = ['haralick_features', 'HaralickExtractor']
+__all__ = ["haralick_features", "HaralickExtractor"]
 
 import numpy as np
-from collections import Sequence
+from collections.abc import Sequence
 
 from pybalu.base import FeatureExtractor
+
 # pylint: disable=no-name-in-module
-from .haralick_utils import norm_cooc_mtrx, cooc_features
+from pybalu.feature_extraction.haralick_utils import norm_cooc_mtrx, cooc_features
+
 # pylint: enable=no-name-in-module
 
 
 def haralick_features(image, region=None, *, distance=3, show=False, labels=False):
-    '''\
+	"""\
 haralick_features(image, region=None, *, distance=3, show=False, labels=False)
 
 Return an array of with the mean and range of 14 different measures over the
@@ -95,57 +97,55 @@ Tx 11, d 12 (range):  0.96111
 Tx 12, d 12 (range):  0.13119
 Tx 13, d 12 (range):  0.16454
 Tx 14, d 12 (range):  0.20168
-'''
-    image = image.astype('double')
+"""
+	image = image.astype("double")
 
-    if region is None:
-        region = np.ones_like(image).astype(int)
+	if region is None:
+		region = np.ones_like(image).astype(int)
 
-    if show:
-        print('--- extracting Haralick texture features...')
+	if show:
+		print("--- extracting Haralick texture features...")
 
-    if not isinstance(distance, Sequence):
-        distance = [distance]
-    dseq = np.array(distance, dtype=int).ravel()
+	if not isinstance(distance, Sequence):
+		distance = [distance]
+	dseq = np.array(distance, dtype=int).ravel()
 
-    features = []
-    label_list = []
-    for d in dseq:
-        cooc = norm_cooc_mtrx(image, region, d)
-        feats = np.vstack([cooc_features(P) for P in cooc])
-        features.append(np.hstack([feats.mean(0), np.abs(feats).max(0)]))
-        if labels:
-            label_list.extend(
-                [f"Tx {i:<2d}, d {d:<2d} (mean)" for i in range(1, 15)])
-            label_list.extend(
-                [f"Tx {i:<2d}, d {d:<2d} (range)" for i in range(1, 15)])
+	features = []
+	label_list = []
+	for d in dseq:
+		cooc = norm_cooc_mtrx(image, region, d)
+		feats = np.vstack([cooc_features(P) for P in cooc])
+		features.append(np.hstack([feats.mean(0), np.abs(feats).max(0)]))
+		if labels:
+			label_list.extend([f"Tx {i:<2d}, d {d:<2d} (mean)" for i in range(1, 15)])
+			label_list.extend([f"Tx {i:<2d}, d {d:<2d} (range)" for i in range(1, 15)])
 
-    haralick_features = np.hstack(features)
+	haralick_features = np.hstack(features)
 
-    if labels:
-        return np.array(label_list), haralick_features
-    return haralick_features
+	if labels:
+		return np.array(label_list), haralick_features
+	return haralick_features
 
 
 class HaralickExtractor(FeatureExtractor):
-    def __init__(self, *, distance=3, show=False):
-        self.show = show
-        self.distance = distance
+	def __init__(self, *, distance=3, show=False):
+		self.show = show
+		self.distance = distance
 
-    def transform(self, X):
-        params = self.get_params()
-        params.update({'show': False})
-        return np.array([haralick_features(x, **params) for x in self._get_iterator(X, desc='haralick')])
+	def transform(self, X):
+		params = self.get_params()
+		params.update({"show": False})
+		return np.array(
+			[haralick_features(x, **params) for x in self._get_iterator(X, desc="haralick")]
+		)
 
-    def get_labels(self):
-        if isinstance(self.distance, Sequence):
-            distance = self.distance
-        else:
-            distance = [self.distance]
-        labels = []
-        for d in distance:
-            labels.extend(
-                [f"Tx {i:<2d}, d {d:<2d} (mean)" for i in range(1, 15)])
-            labels.extend(
-                [f"Tx {i:<2d}, d {d:<2d} (range)" for i in range(1, 15)])
-        return np.array(labels)
+	def get_labels(self):
+		if isinstance(self.distance, Sequence):
+			distance = self.distance
+		else:
+			distance = [self.distance]
+		labels = []
+		for d in distance:
+			labels.extend([f"Tx {i:<2d}, d {d:<2d} (mean)" for i in range(1, 15)])
+			labels.extend([f"Tx {i:<2d}, d {d:<2d} (range)" for i in range(1, 15)])
+		return np.array(labels)

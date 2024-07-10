@@ -1,36 +1,35 @@
 import numpy as np
-from pybalu.classification import structure
-from pybalu.performance_eval import performance
-from .sp100 import sp100
-from .jfisher import jfisher
-
-__all__ = ['score']
+from pybalu.feature_analysis.sp100 import sp100
+from pybalu.feature_analysis.jfisher import jfisher
 
 
-def score(features, classification, *, method='fisher', param=None):
-    if param is None:
-        dn = classification.max() - classification.min() + 1  # number of classes
-        p = np.ones((dn, 1)) / dn
-    else:
-        p = param
+__all__ = ["score"]
 
-    if method == 'mi':  # mutual information
-        raise NotImplementedError()
 
-    # maximal relevance
-    elif method == 'mr':
-        raise NotImplementedError()
+def score(features, classification, *, method="fisher", param=None):
+	if param is None:
+		dn = classification.max() - classification.min() + 1  # number of classes
+		p = np.ones((dn, 1)) / dn
+	else:
+		p = param
 
-    # minimal redundancy and maximal relevance
-    elif method == 'mrmr':
-        raise NotImplementedError()
+	if method == "mi":  # mutual information
+		raise NotImplementedError()
 
-    # fisher
-    elif method == 'fisher':
-        return jfisher(features, classification, p)
+	# maximal relevance
+	elif method == "mr":
+		raise NotImplementedError()
 
-    elif method == 'sp100':
-        return sp100(features, classification)
+	# minimal redundancy and maximal relevance
+	elif method == "mrmr":
+		raise NotImplementedError()
 
-    else:
-        return 0
+	# fisher
+	elif method == "fisher":
+		return jfisher(features, classification, p)
+
+	elif method == "sp100":
+		return sp100(features, classification)
+
+	else:
+		return 0

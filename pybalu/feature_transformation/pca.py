@@ -1,9 +1,10 @@
-__all__ = ['pca']
+__all__ = ["pca"]
 import numpy as np
 from scipy.linalg import eigh
 
+
 def pca(features, *, n_components=0, energy=0):
-    '''\
+	"""\
     pca(features, n_components=0, energy=0)
     
     Principal component analysis
@@ -56,47 +57,47 @@ def pca(features, *, n_components=0, energy=0):
 
     (TODO)
 
-    '''
-    N = features.shape[1]
+    """
+	N = features.shape[1]
 
-    if not isinstance(n_components, int):
-        raise ValueError(f'`n_components` must be a positive int, not {n_components}')
-    if n_components <= 0:
-        if energy == 0:
-            raise ValueError('Either `n_components` or `energy` must be set')
-        if not 0 < energy < 1:
-            raise ValueError(f'`energy` must be a value between 0 and 1, not {energy}')
-        # energy is a valid value
-        n_components = N
-    else:
-        # n_components is a valid value
-        energy = 0
-    
-    feat_mean = features.mean(0)
-    X0 = features - feat_mean
-    Cx = np.cov(X0, rowvar=False)
+	if not isinstance(n_components, int):
+		raise ValueError(f"`n_components` must be a positive int, not {n_components}")
+	if n_components <= 0:
+		if energy == 0:
+			raise ValueError("Either `n_components` or `energy` must be set")
+		if not 0 < energy < 1:
+			raise ValueError(f"`energy` must be a value between 0 and 1, not {energy}")
+		# energy is a valid value
+		n_components = N
+	else:
+		# n_components is a valid value
+		energy = 0
 
-    if energy > 0:
-        # calculate ALL eigenvectors
-        eig_vals, eig_vecs = np.linalg.eigh(Cx) 
-        # reverse them into descending value 
-        _lambda = eig_vals[::-1]
-        transform = eig_vecs[:,::-1]
+	feat_mean = features.mean(0)
+	X0 = features - feat_mean
+	Cx = np.cov(X0, rowvar=False)
 
-        # calculate the number of selected components
-        energy_eig = np.tril(np.ones((N, N))) @ _lambda / _lambda.sum()
-        n_components = np.where(energy_eig > energy)[0][0] + 1
-        transform = transform[:, :n_components]
-        _lambda = _lambda[:n_components]
+	if energy > 0:
+		# calculate ALL eigenvectors
+		eig_vals, eig_vecs = np.linalg.eigh(Cx)
+		# reverse them into descending value
+		_lambda = eig_vals[::-1]
+		transform = eig_vecs[:, ::-1]
 
-    else:
-        # calculate only the wanted number of eigenvectors
-        eig_vals, eig_vecs = eigh(Cx, eigvals=(N-n_components, N-1))
-        # reverse them into descending value 
-        _lambda = eig_vals[::-1]
-        transform = eig_vecs[:,::-1]
+		# calculate the number of selected components
+		energy_eig = np.tril(np.ones((N, N))) @ _lambda / _lambda.sum()
+		n_components = np.where(energy_eig > energy)[0][0] + 1
+		transform = transform[:, :n_components]
+		_lambda = _lambda[:n_components]
 
-    p_components = X0 @ transform
-    new_features = p_components @ transform.T + feat_mean
+	else:
+		# calculate only the wanted number of eigenvectors
+		eig_vals, eig_vecs = eigh(Cx, eigvals=(N - n_components, N - 1))
+		# reverse them into descending value
+		_lambda = eig_vals[::-1]
+		transform = eig_vecs[:, ::-1]
 
-    return p_components, _lambda, transform, feat_mean, new_features
+	p_components = X0 @ transform
+	new_features = p_components @ transform.T + feat_mean
+
+	return p_components, _lambda, transform, feat_mean, new_features

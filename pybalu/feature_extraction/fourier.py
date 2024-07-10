@@ -1,4 +1,4 @@
-__all__ = ['fourier_features', 'FourierExtractor']
+__all__ = ["fourier_features", "FourierExtractor"]
 
 import numpy as np
 import itertools as it
@@ -7,8 +7,10 @@ from PIL import Image
 from pybalu.base import FeatureExtractor
 
 
-def fourier_features(image, region=None, *, vresize=64, hresize=64, vfreq=2, hfreq=2, show=False, labels=False):
-    '''\
+def fourier_features(
+	image, region=None, *, vresize=64, hresize=64, vfreq=2, hfreq=2, show=False, labels=False
+):
+	"""\
 fourier_features(image, region=None, *, vresize=64, hresize=64, vfreq=2, hfreq=2, show=False, labels=False)
 
 Return an array of with the fourier features extracted from an image given resize and frequency
@@ -75,59 +77,67 @@ Fourier Ang (1, 1) [rad]: -0.13091
 Fourier Ang (1, 2) [rad]:  0.07754
 Fourier Ang (2, 1) [rad]:  0.12337
 Fourier Ang (2, 2) [rad]:  0.01847
-'''
+"""
 
-    if region is None:
-        region = np.ones_like(image)
+	if region is None:
+		region = np.ones_like(image)
 
-    I = image.astype(float)
-    I[region == 0] = 0
+	I = image.astype(float)
+	I[region == 0] = 0
 
-    v_half = round(vresize / 2) + 1
-    h_half = round(hresize / 2) + 1
+	v_half = round(vresize / 2) + 1
+	h_half = round(hresize / 2) + 1
 
-    if show:
-        print('--- extracting Fourier features...')
+	if show:
+		print("--- extracting Fourier features...")
 
-    img_resize = _imresize(I, (vresize, hresize))
-    img_fourier = np.fft.fft2(img_resize)
-    img_abs = np.abs(img_fourier)
-    img_angle = np.angle(img_fourier)
+	img_resize = _imresize(I, (vresize, hresize))
+	img_fourier = np.fft.fft2(img_resize)
+	img_abs = np.abs(img_fourier)
+	img_angle = np.angle(img_fourier)
 
-    F = _imresize(img_abs[:v_half, :h_half], (vfreq, hfreq))
-    A = _imresize(img_angle[:v_half, :h_half], (vfreq, hfreq))
+	F = _imresize(img_abs[:v_half, :h_half], (vfreq, hfreq))
+	A = _imresize(img_angle[:v_half, :h_half], (vfreq, hfreq))
 
-    features = np.hstack([F.ravel(), A.ravel()]).astype(float)
-    if labels:
-        fourier_labels = np.zeros(vfreq * hfreq * 2, dtype='<U28')
-        fourier_labels[:vfreq * hfreq] = [f'Fourier Abs ({i}, {j})' for i, j in
-                                          it.product(range(1, vfreq+1), range(1, hfreq+1))]
-        fourier_labels[vfreq * hfreq:] = [f'Fourier Ang ({i}, {j}) [rad]' for i, j in
-                                          it.product(range(1, vfreq+1), range(1, hfreq+1))]
-        return fourier_labels, features
-    return features
+	features = np.hstack([F.ravel(), A.ravel()]).astype(float)
+	if labels:
+		fourier_labels = np.zeros(vfreq * hfreq * 2, dtype="<U28")
+		fourier_labels[: vfreq * hfreq] = [
+			f"Fourier Abs ({i}, {j})"
+			for i, j in it.product(range(1, vfreq + 1), range(1, hfreq + 1))
+		]
+		fourier_labels[vfreq * hfreq :] = [
+			f"Fourier Ang ({i}, {j}) [rad]"
+			for i, j in it.product(range(1, vfreq + 1), range(1, hfreq + 1))
+		]
+		return fourier_labels, features
+	return features
 
 
 def _imresize(arr, size):
-    """Used to keep compatibility with deprecated scipy function `imresize`"""
-    return np.array(Image.fromarray(arr).resize(size))
+	"""Used to keep compatibility with deprecated scipy function `imresize`"""
+	return np.array(Image.fromarray(arr).resize(size))
 
 
 class FourierExtractor(FeatureExtractor):
-    def __init__(self, *, vresize=64, hresize=64, vfreq=2, hfreq=2):
-        self.vresize = vresize
-        self.hresize = hresize
-        self.vfreq = vfreq
-        self.hfreq = hfreq
+	def __init__(self, *, vresize=64, hresize=64, vfreq=2, hfreq=2):
+		self.vresize = vresize
+		self.hresize = hresize
+		self.vfreq = vfreq
+		self.hfreq = hfreq
 
-    def transform(self, X):
-        params = self.get_params()
-        return np.array([fourier_features(x, **params) for x in self._get_iterator(X)])
+	def transform(self, X):
+		params = self.get_params()
+		return np.array([fourier_features(x, **params) for x in self._get_iterator(X)])
 
-    def get_labels(self):
-        labels = np.zeros(self.vfreq * self.hfreq * 2, dtype='<U28')
-        labels[:self.vfreq * self.hfreq] = [f'Fourier Abs ({i}, {j})' for i, j in
-                                            it.product(range(1, self.vfreq+1), range(1, self.hfreq+1))]
-        labels[self.vfreq * self.hfreq:] = [f'Fourier Ang ({i}, {j}) [rad]' for i, j in
-                                            it.product(range(1, self.vfreq+1), range(1, self.hfreq+1))]
-        return labels
+	def get_labels(self):
+		labels = np.zeros(self.vfreq * self.hfreq * 2, dtype="<U28")
+		labels[: self.vfreq * self.hfreq] = [
+			f"Fourier Abs ({i}, {j})"
+			for i, j in it.product(range(1, self.vfreq + 1), range(1, self.hfreq + 1))
+		]
+		labels[self.vfreq * self.hfreq :] = [
+			f"Fourier Ang ({i}, {j}) [rad]"
+			for i, j in it.product(range(1, self.vfreq + 1), range(1, self.hfreq + 1))
+		]
+		return labels

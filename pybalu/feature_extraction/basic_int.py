@@ -1,23 +1,27 @@
-__all__ = ['basic_int_features', 'BasicIntExtractor']
+__all__ = ["basic_int_features", "BasicIntExtractor"]
 
 import numpy as np
 import scipy.stats
+
 # pylint: disable=no-name-in-module
 from pybalu.img_processing import fst_deriv, snd_deriv
-from .geometric_utils import bw_perim
+from pybalu.feature_extraction.geometric_utils import bw_perim
+
 # pylint: enable=no-name-in-module
 from pybalu.base import FeatureExtractor
 
-int_labels = ['Intensity Mean',
-              'Intensity StdDev',
-              'Intensity Kurtosis',
-              'Intensity Skewness',
-              'Mean Laplacian',
-              'Mean Boundary Gradient']
+int_labels = [
+	"Intensity Mean",
+	"Intensity StdDev",
+	"Intensity Kurtosis",
+	"Intensity Skewness",
+	"Mean Laplacian",
+	"Mean Boundary Gradient",
+]
 
 
 def basic_int_features(image, region=None, *, mask=15, show=False, labels=False):
-    '''\
+	"""\
 basic_int_features(image, region=None, *, mask=15, show=False, labels=False)
 
 Return an array of with the basic intensity features of a grayscale image.
@@ -77,52 +81,56 @@ Intensity Kurtosis    :  6.26327
 Intensity Skewness    : -2.15027
 Mean Laplacian        : -23.24741
 Mean Boundary Gradient:  48.57239
-'''
-    if region is None:
-        region = np.ones(shape=image.shape, dtype=int)
-    if show:
-        print('--- extracting basic intensity features...')
+"""
+	if region is None:
+		region = np.ones(shape=image.shape, dtype=int)
+	if show:
+		print("--- extracting basic intensity features...")
 
-    r_perim = bw_perim(region, 4).astype(bool)
-    region = region.astype(bool)
+	r_perim = bw_perim(region, 4).astype(bool)
+	region = region.astype(bool)
 
-    image = image.astype(float)
+	image = image.astype(float)
 
-    im1, _, _ = fst_deriv(image, mask=mask)
-    im2 = snd_deriv(image)
+	im1, _, _ = fst_deriv(image, mask=mask)
+	im2 = snd_deriv(image)
 
-    if not region.all():
-        boundary_gradient = np.abs(im1[r_perim]).mean()
-    else:
-        boundary_gradient = -1
+	if not region.all():
+		boundary_gradient = np.abs(im1[r_perim]).mean()
+	else:
+		boundary_gradient = -1
 
-    useful_img = image[region]
+	useful_img = image[region]
 
-    intensity_mean = useful_img.mean()
-    intensity_std = useful_img.std(ddof=1)
-    intensity_kurtosis = scipy.stats.kurtosis(useful_img, fisher=False)
-    intensity_skewness = scipy.stats.skew(useful_img)
-    mean_laplacian = im2[region].mean()
+	intensity_mean = useful_img.mean()
+	intensity_std = useful_img.std(ddof=1)
+	intensity_kurtosis = scipy.stats.kurtosis(useful_img, fisher=False)
+	intensity_skewness = scipy.stats.skew(useful_img)
+	mean_laplacian = im2[region].mean()
 
-    int_features = np.array([intensity_mean,
-                             intensity_std,
-                             intensity_kurtosis,
-                             intensity_skewness,
-                             mean_laplacian,
-                             boundary_gradient])
+	int_features = np.array(
+		[
+			intensity_mean,
+			intensity_std,
+			intensity_kurtosis,
+			intensity_skewness,
+			mean_laplacian,
+			boundary_gradient,
+		]
+	)
 
-    if labels:
-        return np.array(int_labels), int_features
-    return int_features
+	if labels:
+		return np.array(int_labels), int_features
+	return int_features
 
 
 class BasicIntExtractor(FeatureExtractor):
-    def __init__(self, *, mask=15):
-        self.mask = mask
+	def __init__(self, *, mask=15):
+		self.mask = mask
 
-    def transform(self, X):
-        params = self.get_params()
-        return np.array([basic_int_features(x, **params) for x in self._get_iterator(X)])
+	def transform(self, X):
+		params = self.get_params()
+		return np.array([basic_int_features(x, **params) for x in self._get_iterator(X)])
 
-    def get_labels(self):
-        return np.array(int_labels)
+	def get_labels(self):
+		return np.array(int_labels)

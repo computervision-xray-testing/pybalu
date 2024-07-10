@@ -1,11 +1,11 @@
-__all__ = ['flusser_features', 'FlusserExtractor']
+__all__ = ["flusser_features", "FlusserExtractor"]
 import numpy as np
-from .flusser_utils import flusser as _flusser, f_labels
+from pybalu.feature_extraction.flusser_utils import flusser as _flusser, f_labels
 from pybalu.base import FeatureExtractor
 
 
 def flusser_features(image, show=False, labels=False):
-    '''\
+	"""\
 flusser_features(image, *, show=False, labels=False)
 
 Return an array of with the the four Flusser moments extracted from a binary image.
@@ -54,14 +54,13 @@ Flusser-moment 1:  0.03429
 Flusser-moment 2: -0.00000
 Flusser-moment 3: -0.00009
 Flusser-moment 4:  0.00003
-'''
-    return _flusser(image, show=show, labels=labels)
+"""
+	return _flusser(image, show=show, labels=labels)
 
 
 class FlusserExtractor(FeatureExtractor):
+	def transform(self, X):
+		return np.array([flusser_features(x) for x in self._get_iterator(X)])
 
-    def transform(self, X):
-        return np.array([flusser_features(x) for x in self._get_iterator(X)])
-
-    def get_labels(self):
-        return np.array(f_labels)
+	def get_labels(self):
+		return np.array(f_labels)

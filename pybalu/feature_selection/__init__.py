@@ -1,8 +1,6 @@
-from .clean import clean
-from .exsearch import exsearch
-from .sfs import sfs
+from pybalu.feature_selection.clean import clean
+from pybalu.feature_selection.exsearch import exsearch
+from pybalu.feature_selection.sfs import sfs
 
 
-__all__ = ["clean",
-           "exsearch",
-           "sfs"]
+__all__ = ["clean", "exsearch", "sfs"]
