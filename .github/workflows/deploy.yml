@@ -7,9 +7,9 @@ on:
   # pull_request:
   #   branches:
   #     - master
-  # release:
-  #   types:
-  #     - published
+  release:
+    types:
+      - published
 
 jobs:
   build_wheels:
