@@ -3,6 +3,7 @@ name: Build all Wheels
 on:
   release:
     types: [created]
+  workflow_dispatch:
 
 jobs:
 
@@ -68,7 +69,7 @@ jobs:
   
   upload:
     needs:
-      - wheels
+      - build_wheels
       - sdist
     runs-on: ubuntu-latest
     steps:
