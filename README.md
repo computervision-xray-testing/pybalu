@@ -39,7 +39,7 @@
       </ul>
     </li>
     <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#Roadmap">Contributing</a></li>
+    <li><a href="#Roadmap">Roadmap</a></li>
   </ol>
 </details>
 
@@ -63,7 +63,7 @@ $ pip install pybalu
 
 # Contributing
 
-We follow github flow standard. If you would like to contribute:
+We follow [github flow](https://www.atlassian.com/es/git/tutorials/comparing-workflows/gitflow-workflow) standard. If you would like to contribute:
 
 - Fork the repo
 - Create a new branch called `feature/<feature-desc>` or `fix/<fix-desc>` depending on the nature of your contribution
@@ -82,6 +82,13 @@ In case of contribution, once you have clone the repository, install the develop
 ```bash
 $ pip install .[dev]
 ```
+
+In `zsh` you could use
+
+```bash
+$ pip install ."[dev]"
+```
+
 
 ## Roadmap
 

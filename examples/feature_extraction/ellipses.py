@@ -28,28 +28,8 @@ del matplotlib
 # %% [markdown]
 # ## Loading and displaying the image
 
-# %%
-im = imread("feature_extraction/rice.png")
-plt.title("Original Image", fontdict={"fontsize": 20}, pad=20)
-plt.imshow(im, cmap="gray")
-plt.show()
 
-# %% [markdown]
-# ## Recognizing rice grains
-# In order to recognize the grains, the following steps are followed:
-#
-#   1. Image is transformed to binary
-#   2. Rice grains are separated and labeled accordingly
-#   3. Geometric features are calculated for each grain by using `basic_geo_features` function
-#   4. An `Ellipse` object is built for each grain
-
-# %%
-im_bin = (im > 140).astype(int)
-labeled, n = label(im_bin, return_num=True)
-labeled_T = labeled.T
-
-
-def calc_ellipse(idx):
+def calc_ellipse(idx, labeled_T):
 	region = (labeled_T == idx).astype(int)
 	box = _bbox(region)
 	feats = basic_geo_features(region[box])
@@ -64,16 +44,8 @@ def calc_ellipse(idx):
 	)
 
 
-with Pool() as pool:
-	ellipses = np.vstack(pool.map(calc_ellipse, range(1, n)))
-
-# %% [markdown]
-# ## Displaying the ellipses over the original image
-
-# %%
-ax = plt.axes()
-plt.title("Segmented Image")
-plt.imshow(im, cmap="gray")
+def calc_ellipse_wrapper(args):
+	return calc_ellipse(*args)
 
 
 def draw_ellipse(x, y, height, width, angle, axes):
@@ -85,39 +57,7 @@ def draw_ellipse(x, y, height, width, angle, axes):
 	return ell
 
 
-for ell in ellipses:
-	draw_ellipse(*ell, axes=ax)
-
-plt.show()
-
-# %% [markdown]
-# ## Finding mean sized (major axis) rice grains
-# Rice grains whose major axis is between the 25th and 75th percentile are highlighted.
-# This is done with the help numpy matrix operations
-
-
-# %%
-plt.title("Mean sized rice grains (major axis)")
-
-major_25 = np.percentile(ellipses[:, 3], 25)
-major_75 = np.percentile(ellipses[:, 3], 75)
-
-valid_labels = 1 + np.where((ellipses[:, 3] > major_25) & (ellipses[:, 3] < major_75))[0]
-im_mean = np.array(im)
-im_mean[np.where(~np.isin(labeled, valid_labels))] //= 7
-plt.imshow(im_mean, cmap="gray")
-plt.show()
-
-
-# %% [markdown]
-# ## Finding rice grains oriented at a specific angle
-# Rice grains rotation is within 10deg of the given angle are highlighted. Just as
-# before, this is done with the help of numpy matrix operations
-
-# %%
-
-
-def draw_at_angle(theta):
+def draw_at_angle(theta, ellipses, labeled, im):
 	valid_labels = 1 + np.where((ellipses[:, 4] > theta - 10) & (ellipses[:, 4] < theta + 10))[0]
 	plt.title(f"Orientation at {theta} deg")
 	im_rotated = np.array(im)
@@ -126,4 +66,77 @@ def draw_at_angle(theta):
 	plt.show()
 
 
-draw_at_angle(45)
+def main():
+	# %%
+	im = imread("feature_extraction/rice.png")
+	plt.title("Original Image", fontdict={"fontsize": 20}, pad=20)
+	plt.imshow(im, cmap="gray")
+	plt.show()
+
+	# %% [markdown]
+	# ## Recognizing rice grains
+	# In order to recognize the grains, the following steps are followed:
+	#
+	#   1. Image is transformed to binary
+	#   2. Rice grains are separated and labeled accordingly
+	#   3. Geometric features are calculated for each grain by using `basic_geo_features` function
+	#   4. An `Ellipse` object is built for each grain
+
+	# %%
+	im_bin = (im > 140).astype(int)
+	labeled, n = label(im_bin, return_num=True)
+	labeled_T = labeled.T
+
+	parameters = [(i, labeled_T) for i in range(1, n)]
+
+	with Pool() as pool:
+		ellipses = np.vstack(pool.map(calc_ellipse_wrapper, parameters))
+
+	# %% [markdown]
+	# ## Displaying the ellipses over the original image
+
+	# %%
+	ax = plt.axes()
+	plt.title("Segmented Image")
+	plt.imshow(im, cmap="gray")
+
+	for ell in ellipses:
+		draw_ellipse(*ell, axes=ax)
+
+	plt.show()
+
+	# %% [markdown]
+	# ## Finding mean sized (major axis) rice grains
+	# Rice grains whose major axis is between the 25th and 75th percentile are highlighted.
+	# This is done with the help numpy matrix operations
+
+	# %%
+	plt.title("Mean sized rice grains (major axis)")
+
+	major_25 = np.percentile(ellipses[:, 3], 25)
+	major_75 = np.percentile(ellipses[:, 3], 75)
+
+	valid_labels = 1 + np.where((ellipses[:, 3] > major_25) & (ellipses[:, 3] < major_75))[0]
+	im_mean = np.array(im)
+	im_mean[np.where(~np.isin(labeled, valid_labels))] //= 7
+	plt.imshow(im_mean, cmap="gray")
+	plt.show()
+
+	# %% [markdown]
+	# ## Finding rice grains oriented at a specific angle
+	# Rice grains rotation is within 10deg of the given angle are highlighted. Just as
+	# before, this is done with the help of numpy matrix operations
+
+	# %%
+	draw_at_angle(45, ellipses, labeled, im)
+
+
+if __name__ == "__main__":
+	"""
+    The main function is required to run multiprocessing within a safe enclosure. The implementation
+    of multiprocessing is different on Windows, which uses spawn instead of fork. So we have to wrap the
+    code with an if-clause to protect the code from executing multiple times. Refactor your code into the
+    following structure. For more detail, please review, for instance,
+    https://pytorch.org/docs/stable/notes/windows.html#multiprocessing-error-without-if-clause-protection
+    """
+	main()
