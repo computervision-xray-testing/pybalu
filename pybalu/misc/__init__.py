@@ -4,7 +4,7 @@ import numpy as _np
 
 
 def im2col(image, n, m):
-    '''\
+	"""\
     im2col(image, n, m)
 
     Rearranges discrete image blocks of size m-by-n into columns, and returns the concatenated columns. 
@@ -45,38 +45,37 @@ def im2col(image, n, m):
      [ 6 16  9 19]
      [ 2 12  0  0]
      [ 7 17  0  0]]
-    '''
-    image = image.T
-    n, m = m, n
-    N, M = image.shape
-    dn, rn = divmod(N, n)
-    dm, rm = divmod(M, m)
-    if rn or rm:
-        if rn:
-            _N = (dn+1)*n
-        else:
-            _N = N
-        if rm:
-            _M = (dm+1)*m
-        else:
-            _M = M
-        _img = _np.zeros((_N, _M), dtype=image.dtype)
-        _img[:N, :M] = image
-    else:
-        _img = _np.ascontiguousarray(image)
+    """
+	image = image.T
+	n, m = m, n
+	N, M = image.shape
+	dn, rn = divmod(N, n)
+	dm, rm = divmod(M, m)
+	if rn or rm:
+		if rn:
+			_N = (dn + 1) * n
+		else:
+			_N = N
+		if rm:
+			_M = (dm + 1) * m
+		else:
+			_M = M
+		_img = _np.zeros((_N, _M), dtype=image.dtype)
+		_img[:N, :M] = image
+	else:
+		_img = _np.ascontiguousarray(image)
 
-    arr_shape = _np.array(_img.shape)
-    block_shape = _np.array([n, m])
-    new_shape = tuple(arr_shape // block_shape) + tuple(block_shape)
-    new_strides = tuple(_img.strides * block_shape) + _img.strides
-    blocks = _np.lib.stride_tricks.as_strided(
-        _img, shape=new_shape, strides=new_strides)
-    _n, _m, *_ = new_shape
-    return blocks.reshape(_n*_m, -1).T
+	arr_shape = _np.array(_img.shape)
+	block_shape = _np.array([n, m])
+	new_shape = tuple(arr_shape // block_shape) + tuple(block_shape)
+	new_strides = tuple(_img.strides * block_shape) + _img.strides
+	blocks = _np.lib.stride_tricks.as_strided(_img, shape=new_shape, strides=new_strides)
+	_n, _m, *_ = new_shape
+	return blocks.reshape(_n * _m, -1).T
 
 
 def im2row(image, n, m):
-    '''\
+	"""\
     im2row(image, n, m)
 
     Divides the given image into overlaping blocks that slide accross the image and returns the 
@@ -124,15 +123,14 @@ def im2row(image, n, m):
      [ 8  9 12 13]
      [ 9 10 13 14]
      [10 11 14 15]]
-    '''
-    _img = _np.ascontiguousarray(image)
-    N, M = _img.shape
-    hh = N // (n + 1)
-    hw = M // (m + 1)
-    vs, hs = _img.strides
+    """
+	_img = _np.ascontiguousarray(image)
+	N, M = _img.shape
+	hh = N // (n + 1)
+	hw = M // (m + 1)
+	vs, hs = _img.strides
 
-    new_shape = (n, m, hh*2, hw*2)
-    new_strides = (vs * hh, hs * hw, vs, hs)
-    windows = _np.lib.stride_tricks.as_strided(
-        _img, shape=new_shape, strides=new_strides)
-    return windows.reshape(n * m, -1)
+	new_shape = (n, m, hh * 2, hw * 2)
+	new_strides = (vs * hh, hs * hw, vs, hs)
+	windows = _np.lib.stride_tricks.as_strided(_img, shape=new_shape, strides=new_strides)
+	return windows.reshape(n * m, -1)

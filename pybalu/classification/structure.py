@@ -3,9 +3,18 @@ __all__ = ["structure"]
 import numpy as np
 
 
-def structure(classifier, *, train_data=None, test_data=None, train_classes=None, initialize=True,
-              fit_method='fit', predict_method='predict', classifier_opts=None):
-    '''\
+def structure(
+	classifier,
+	*,
+	train_data=None,
+	test_data=None,
+	train_classes=None,
+	initialize=True,
+	fit_method="fit",
+	predict_method="predict",
+	classifier_opts=None,
+):
+	"""\
     structure(classifier, train_data=None, test_data=None, train_classes=None, initialize=True,
               fit_method='fit', predict_method='predict, classifier_opts=None)
 
@@ -55,31 +64,31 @@ def structure(classifier, *, train_data=None, test_data=None, train_classes=None
     Examples
     --------
     ( TODO )
-    '''
+    """
 
-    if not hasattr(classifier, fit_method) or not hasattr(classifier, predict_method):
-        raise ValueError(
-            f"`classifier` must define methods `{fit_method}` and `{predict_method}` in order to be considered a valid classifier"
-        )
+	if not hasattr(classifier, fit_method) or not hasattr(classifier, predict_method):
+		raise ValueError(
+			f"`classifier` must define methods `{fit_method}` and `{predict_method}` in order to be considered a valid classifier"
+		)
 
-    classifier_opts = classifier_opts or dict()
+	classifier_opts = classifier_opts or dict()
 
-    if initialize:
-        classifier_instance = classifier(**classifier_opts)
-    else:
-        classifier_instance = classifier
+	if initialize:
+		classifier_instance = classifier(**classifier_opts)
+	else:
+		classifier_instance = classifier
 
-    if train_data is not None:
-        if train_classes is None:
-            raise ValueError(
-                "`train_features` given but no `classification` given to train classifier"
-            )
+	if train_data is not None:
+		if train_classes is None:
+			raise ValueError(
+				"`train_features` given but no `classification` given to train classifier"
+			)
 
-        classifier_instance = classifier(**classifier_opts)
-        getattr(classifier_instance, fit_method)(train_data, train_classes)
+		classifier_instance = classifier(**classifier_opts)
+		getattr(classifier_instance, fit_method)(train_data, train_classes)
 
-    if test_data is not None:
-        prediction = getattr(classifier_instance, predict_method)(test_data)
-        return np.array(prediction), classifier_instance
+	if test_data is not None:
+		prediction = getattr(classifier_instance, predict_method)(test_data)
+		return np.array(prediction), classifier_instance
 
-    return np.empty(0), classifier_instance
+	return np.empty(0), classifier_instance

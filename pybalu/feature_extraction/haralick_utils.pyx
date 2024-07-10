@@ -1,17 +1,18 @@
 __all__ = ['noorm_cooc_mtrx', 'cooc_features']
 
-cimport numpy as np
 cimport cython
+cimport numpy as cnp
 import numpy as np
+
 
 @cython.wraparound(False)
 @cython.boundscheck(False)
-def norm_cooc_mtrx(np.ndarray I, np.ndarray[np.int_t, ndim=2] R, int d):
+def norm_cooc_mtrx(cnp.ndarray I, cnp.ndarray[cnp.int, ndim=2] R, int d):
     
     cdef int i, j, v1, v2, h_tot, v_tot, d1_tot, d2_tot
-    cdef np.ndarray[np.double_t, ndim=3] co_occ
-    cdef np.ndarray[np.int_t, ndim=2] V
-    cdef np.ndarray[np.int_t, ndim=1] ii, jj, tot
+    cdef cnp.ndarray[cnp.double_t, ndim=3] co_occ
+    cdef cnp.ndarray[cnp.int, ndim=2] V
+    cdef cnp.ndarray[cnp.int, ndim=1] ii, jj, tot
     
     # normalize for only 8 pixel values and get rid of values not in R
     V = np.zeros(shape=(I.shape[0] + 2*d, I.shape[1] + 2*d), dtype=int)
@@ -31,31 +32,31 @@ def norm_cooc_mtrx(np.ndarray I, np.ndarray[np.int_t, ndim=2] R, int d):
             if v1 >= 0 and v2 >= 0:
                 co_occ[0, v1, v2] += 1
                 co_occ[0, v2, v1] += 1
-                tot[0] += 2
+                tot[0] = tot[0] + 2
             # diagonal 1
             v2 = V[i+d, j-d]
             if v1 >= 0 and v2 >= 0:
                 co_occ[1, v1, v2] += 1
                 co_occ[1, v2, v1] += 1
-                tot[1] += 2
+                tot[1] = tot[1] + 2
             # horizontal
             v2 = V[i, j+d]
             if v1 >= 0 and v2 >= 0:
                 co_occ[2, v1, v2] += 1
                 co_occ[2, v2, v1] += 1
-                tot[2] += 2
+                tot[2] = tot[2] + 2
             # diagonal 2
             v2 = V[i+d, j+d]
             if v1 >= 0 and v2 >= 0:
                 co_occ[3, v1, v2] += 1
                 co_occ[3, v2, v1] += 1
-                tot[3] += 2
+                tot[3] = tot[3] + 2
     return co_occ / tot.reshape(4, 1, 1)
     
 
 @cython.wraparound(False)
 @cython.boundscheck(False)
-def cooc_features(np.ndarray[np.double_t, ndim=2] P):
+def cooc_features(cnp.ndarray[cnp.double_t, ndim=2] P):
     
     cdef N, i, j
 

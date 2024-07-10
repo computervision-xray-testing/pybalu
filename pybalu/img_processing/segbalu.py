@@ -1,14 +1,14 @@
-__all__ = ['segbalu', 'SegBaluSegmentator']
+__all__ = ["segbalu", "SegBaluSegmentator"]
 
 import numpy as np
 from pybalu.base import ImageProcessor
 from skimage.filters import threshold_otsu
-from .rgb2hcm import rgb2hcm
-from .morphoreg import morphoreg
+from pybalu.img_processing.rgb2hcm import rgb2hcm
+from pybalu.img_processing.morphoreg import morphoreg
 
 
-def segbalu(image, p=-.05):
-    '''\
+def segbalu(image, p=-0.05):
+	"""\
     segbalu(image, p=-.05)
 
     Segmentation of an object with homogeneous background.
@@ -37,27 +37,30 @@ def segbalu(image, p=-.05):
     Examples
     --------
     (TODO)
-    '''
-    hcm = rgb2hcm(image.astype('double'))
-    threshold = threshold_otsu(hcm)
-    region, edge = morphoreg(hcm, threshold + p)
-    return region, edge, hcm
+    """
+	hcm = rgb2hcm(image.astype("double"))
+	threshold = threshold_otsu(hcm)
+	region, edge = morphoreg(hcm, threshold + p)
+	return region, edge, hcm
 
 
 class SegBaluSegmentator(ImageProcessor):
-    def __init__(self, *, p=-.05, returns='all', show=False):
-        self.show = show
+	def __init__(self, *, p=-0.05, returns="all", show=False):
+		self.show = show
 
-        self.p = p
-        self.returns = returns
-        if returns == 'all':
-            self.idx = slice(0, 3)
-        elif returns in ['region', 'edges', 'hcm']:
-            self.idx = ['region', 'edges', 'hcm'].index(returns)
-        else:
-            raise ValueError(
-                f"Invalid value for <returns>: '{returns}'"
-            )
+		self.p = p
+		self.returns = returns
+		if returns == "all":
+			self.idx = slice(0, 3)
+		elif returns in ["region", "edges", "hcm"]:
+			self.idx = ["region", "edges", "hcm"].index(returns)
+		else:
+			raise ValueError(f"Invalid value for <returns>: '{returns}'")
 
-    def transform(self, X):
-        return np.array([segbalu(x, self.p)[self.idx] for x in self._get_iterator(X, desc=f'segbalu_{self.returns}')])
+	def transform(self, X):
+		return np.array(
+			[
+				segbalu(x, self.p)[self.idx]
+				for x in self._get_iterator(X, desc=f"segbalu_{self.returns}")
+			]
+		)

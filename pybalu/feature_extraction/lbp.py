@@ -1,4 +1,4 @@
-__all__ = ['lbp_features', 'LBPExtractor']
+__all__ = ["lbp_features", "LBPExtractor"]
 
 import numpy as np
 from pybalu.misc import im2col
@@ -8,7 +8,7 @@ from pybalu.base import FeatureExtractor
 
 
 def lbp_features(image, region=None, *, show=False, labels=False, **kwargs):
-    '''\
+	"""\
     lbp_features(image, region=None, *, show=False, labels=False, **kwargs)
 
     Calculates the Local Binary Patterns over a regular grid of patches. It returns an array
@@ -75,116 +75,118 @@ def lbp_features(image, region=None, *, show=False, labels=False, **kwargs):
     Examples
     --------
     ( TODO )
-    '''
-    vdiv = kwargs.pop('vdiv', None)
-    hdiv = kwargs.pop('hdiv', None)
-    if vdiv is None or hdiv is None:
-        raise ValueError('`vdiv` and `hdiv` must be given to lbp.')
+    """
+	vdiv = kwargs.pop("vdiv", None)
+	hdiv = kwargs.pop("hdiv", None)
+	if vdiv is None or hdiv is None:
+		raise ValueError("`vdiv` and `hdiv` must be given to lbp.")
 
-    if region is None:
-        region = np.ones_like(image)
+	if region is None:
+		region = np.ones_like(image)
 
-    samples = kwargs.pop('samples', 8)
-    normalize = kwargs.pop('norm', False)
-    integral = kwargs.pop('integral', False)
-    max_d = kwargs.pop('max_d', None)
-    if integral and max_d is None:
-        raise ValueError('`max_d` must be set if `integral` is set to True.')
+	samples = kwargs.pop("samples", 8)
+	normalize = kwargs.pop("norm", False)
+	integral = kwargs.pop("integral", False)
+	max_d = kwargs.pop("max_d", None)
+	if integral and max_d is None:
+		raise ValueError("`max_d` must be set if `integral` is set to True.")
 
-    weight = kwargs.pop('weight', 0)
-    mapping = kwargs.pop('mapping', 'default')
+	weight = kwargs.pop("weight", 0)
+	mapping = kwargs.pop("mapping", "default")
 
-    if mapping == 'ror' or mapping == 'default':
-        num_patterns = 2 ** samples
-    elif mapping == 'uniform':
-        num_patterns = samples + 2
-    elif mapping == 'nri_uniform':
-        num_patterns = 59
-    else:
-        raise ValueError(f"Unknown mapping: '{mapping}'")
+	if mapping == "ror" or mapping == "default":
+		num_patterns = 2**samples
+	elif mapping == "uniform":
+		num_patterns = samples + 2
+	elif mapping == "nri_uniform":
+		num_patterns = 59
+	else:
+		raise ValueError(f"Unknown mapping: '{mapping}'")
 
-    radius = kwargs.pop('radius', None)
-    if radius is None:
-        radius = np.log(samples) / np.log(2) - 1
+	radius = kwargs.pop("radius", None)
+	if radius is None:
+		radius = np.log(samples) / np.log(2) - 1
 
-    ret_centers = kwargs.pop('ret_centers', False)
+	ret_centers = kwargs.pop("ret_centers", False)
 
-    if len(kwargs) > 0:
-        unknowns = "'" + "', '".join(kwargs.keys()) + "'"
-        raise ValueError(f"Unknown options given to lbp: {unknowns}")
+	if len(kwargs) > 0:
+		unknowns = "'" + "', '".join(kwargs.keys()) + "'"
+		raise ValueError(f"Unknown options given to lbp: {unknowns}")
 
-    if show:
-        print('--- extracting local binary patterns features...')
-    label = 'LBP'
+	if show:
+		print("--- extracting local binary patterns features...")
+	label = "LBP"
 
-    # set pixels not within region to 0
-    image = image.copy()
-    image[~region.astype(bool)] = 0
+	# set pixels not within region to 0
+	image = image.copy()
+	image[~region.astype(bool)] = 0
 
-    code_img = _lbp(image, P=samples, R=radius, method=mapping)
-    n, m = code_img.shape
-    N, M = image.shape
-    Ilbp = np.zeros_like(image)
-    i1 = round((N - n)/2)
-    j1 = round((M - m)/2)
-    Ilbp[i1:i1+n, j1:j1+m] = code_img
+	code_img = _lbp(image, P=samples, R=radius, method=mapping)
+	n, m = code_img.shape
+	N, M = image.shape
+	Ilbp = np.zeros_like(image)
+	i1 = round((N - n) / 2)
+	j1 = round((M - m) / 2)
+	Ilbp[i1 : i1 + n, j1 : j1 + m] = code_img
 
-# TODO:
-#     if integral:
-#         hx = inthist(Ilbp+1, max_d)
+	# TODO:
+	#     if integral:
+	#         hx = inthist(Ilbp+1, max_d)
 
-    ylen = int(np.ceil(n / vdiv))
-    xlen = int(np.ceil(m / hdiv))
-    grid_img = im2col(code_img, ylen, xlen) + 1
+	ylen = int(np.ceil(n / vdiv))
+	xlen = int(np.ceil(m / hdiv))
+	grid_img = im2col(code_img, ylen, xlen) + 1
 
-    if weight > 0:
-        label = 'W-' + label
-        pass
-    else:
-        desc = np.vstack([np.histogram(grid_img[:, i], num_patterns)[0]
-                          for i in range(grid_img.shape[1])])
+	if weight > 0:
+		label = "W-" + label
+		pass
+	else:
+		desc = np.vstack(
+			[np.histogram(grid_img[:, i], num_patterns)[0] for i in range(grid_img.shape[1])]
+		)
 
-    lbp_feats = desc.ravel()
-    N, M = desc.shape
+	lbp_feats = desc.ravel()
+	N, M = desc.shape
 
-    if normalize:
-        lbp_feats = lbp_feats / lbp_feats.sum()
+	if normalize:
+		lbp_feats = lbp_feats / lbp_feats.sum()
 
-    if not labels and not ret_centers:
-        return lbp_feats
+	if not labels and not ret_centers:
+		return lbp_feats
 
-    if labels:
-        lbp_labels = []
-        for i in range(N):
-            for j in range(M):
-                lbp_labels.append(
-                    f"{label}({i+1},{j+1:>2d}) [{samples},'{mapping}']")
-        ret = np.array(lbp_labels), lbp_feats
-    else:
-        ret = (lbp_feats,)
+	if labels:
+		lbp_labels = []
+		for i in range(N):
+			for j in range(M):
+				lbp_labels.append(f"{label}({i+1},{j+1:>2d}) [{samples},'{mapping}']")
+		ret = np.array(lbp_labels), lbp_feats
+	else:
+		ret = (lbp_feats,)
 
-    if ret_centers:
-        dx = 1 / hdiv
-        dy = 1 / vdiv
-        x = np.linspace(dx / 2, 1 - dx / 2, hdiv)
-        y = np.linspace(dy / 2, 1 - dy / 2, vdiv)
-        ret = (ret,) + (x, y)
+	if ret_centers:
+		dx = 1 / hdiv
+		dy = 1 / vdiv
+		x = np.linspace(dx / 2, 1 - dx / 2, hdiv)
+		y = np.linspace(dy / 2, 1 - dy / 2, vdiv)
+		ret = (ret,) + (x, y)
 
-    return ret
+	return ret
 
 
 class LBPExtractor(FeatureExtractor):
-    def __init__(self, *, hdiv=None, vdiv=None, samples=8, norm=False, mapping="default", radius=None):
-        self.hdiv = hdiv
-        self.vdiv = vdiv
-        self.samples = samples
-        self.norm = norm
-        self.mapping = mapping
-        self.radius = radius
+	def __init__(
+		self, *, hdiv=None, vdiv=None, samples=8, norm=False, mapping="default", radius=None
+	):
+		self.hdiv = hdiv
+		self.vdiv = vdiv
+		self.samples = samples
+		self.norm = norm
+		self.mapping = mapping
+		self.radius = radius
 
-    def transform(self, X):
-        params = self.get_params()
-        return np.array([lbp_features(x, **params) for x in self._get_iterator(X)])
+	def transform(self, X):
+		params = self.get_params()
+		return np.array([lbp_features(x, **params) for x in self._get_iterator(X)])
 
-    def get_labels(self):
-        return "LBP"
+	def get_labels(self):
+		return "LBP"
