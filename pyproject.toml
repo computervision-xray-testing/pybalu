@@ -4,7 +4,7 @@ name = "pybalu"
 
 description = "Python3 implementation of the computer vision and pattern recognition library Balu."
 
-version = "0.3.0"
+version = "0.3.1"
 
 authors = [
     {name = "Domingo Mery", email = "domingo.mery@uc.cl"},
