@@ -3,6 +3,7 @@ from Cython.Build import cythonize
 import numpy
 
 
+# Manage extensions
 geometric_utils = Extension(
 	"pybalu.feature_extraction.geometric_utils",
 	sources=["pybalu/feature_extraction/geometric_utils.pyx"],
@@ -36,6 +37,9 @@ external_modules = cythonize(
 	],
 	compiler_directives={"language_level": 3},
 )
+
+
+# Package configuration
 
 setup(
 	ext_modules=external_modules,

@@ -1,4 +1,4 @@
-name: Build all Wheels
+name: CI/CD
 
 on:
   release:

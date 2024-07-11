@@ -4,11 +4,11 @@ name = "pybalu"
 
 description = "Python3 implementation of the computer vision and pattern recognition library Balu."
 
-version = "0.3.1"
+dynamic = ["version", "readme"]
 
 authors = [
-    {name = "Domingo Mery", email = "domingo.mery@uc.cl"},
     {name = "Marco Bucchi", email = "mabucchi@uc.cl"},
+    {name = "Domingo Mery", email = "domingo.mery@uc.cl"},
 ]
 
 maintainers = [
@@ -28,6 +28,18 @@ dependencies = [
 license = { file = "LICENSE" }
 
 requires-python = ">=3.10"
+
+
+[project.optional-dependencies]
+
+dev = [
+    "black",
+    "flake8",
+    "ruff",
+    "matplotlib",
+    "pytest",
+    "twine"
+]
 
 
 [build-system]
@@ -52,21 +64,16 @@ packages = [
     "pybalu.performance_eval",
 ]
 
+[tool.setuptools.dynamic]
 
-[project.optional-dependencies]
-
-dev = [
-    "black",
-    "flake8",
-    "ruff",
-    "matplotlib",
-]
+version = { attr = "pybalu.__version__" }
+readme = { file = ["README.md"] }
 
 
 [tool.black]
 
 line-length = 100
-target-version = ["py310", "py311"]
+target-version = ["py310", "py311", "py312"]
 
 
 [tool.ruff]
