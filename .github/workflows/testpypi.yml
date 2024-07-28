@@ -6,8 +6,8 @@ on:
 jobs:
   build_wheels:
     
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: Build wheel for ${{matrix.python.cp}}-${{matrix.buildplat.sys}}-${{matrix.buildplat.arch}}
+    runs-on: ${{ matrix.buildplat.runs_on }}
     
     strategy:
       matrix:
