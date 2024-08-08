@@ -34,7 +34,7 @@ jobs:
       
       - name: Build wheels
         # uses: pypa/cibuildwheel@v2.20.0
-        run: pythom -m cibuildwheel --output-dir wheels
+        run: python -m cibuildwheel --output-dir wheels
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
