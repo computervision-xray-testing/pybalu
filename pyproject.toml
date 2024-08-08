@@ -86,32 +86,3 @@ line-length = 100
 indent-style = "tab"
 docstring-code-format = true
 docstring-code-line-length = 72
-
-
-[tool.cibuildwheel]
-
-manylinux-x86_64-image = "manylinux2014"
-manylinux-aarch64-image = "manylinux2014"
-
-# Build CPython 3.8 - 3.11
-build = ["cp38-*", "cp39-*", "cp310-*", "cp311-*"]
-
-# Disable building musllinux wheels on all platforms
-skip = ["pp*", "*musllinux*"]
-
-
-[tool.cibuildwheel.macos]
-
-# Build `x86_64` and `arm64` wheels on an Intel runner.
-# Note that the `arm64` wheel cannot be tested in this configuration.
-archs = ["x86_64", "arm64"]
-
-[tool.cibuildwheel.linux]
-
-# On an Linux Intel runner with qemu installed, build Intel and ARM wheels
-archs = ["x86_64", "aarch64"]
-
-[tool.cibuildwheel.windows]
-
-# On an Windows Intel runner build wheels
-archs = ["AMD64", "x86"]
