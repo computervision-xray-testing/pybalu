@@ -32,7 +32,7 @@ jobs:
           python -m pip install numpy
       
       - name: Build wheels
-        uses: pypa/cibuildwheels@v2.20.0
+        uses: pypa/cibuildwheel@v2.20.0
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
