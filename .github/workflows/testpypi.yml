@@ -6,29 +6,21 @@ on:
 jobs:
   build_wheels:
     
-    name: Build wheel for ${{matrix.python.cp}}-${{matrix.buildplat.sys}}-${{matrix.buildplat.arch}}
-    runs-on: ${{ matrix.buildplat.runs_on }}
-    
+    name: Build wheel on ${{ matrix.os }}-${{ matrix.python }}$
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        buildplat:
-          - { runs_on: ubuntu-latest, sys: manylinux, arch: x86_64, benv: "" }
-          - { runs_on: macos-latest, sys: macosx, arch: arm64, benv: "14.0" }
-          - { runs_on: windows-latest, sys: win, arch: AMD64, benv: "" }
-        python:
-          - { cp: "cp310",  rel: "3.10" }
-          - { cp: "cp311",  rel: "3.11" }
-          - { cp: "cp312",  rel: "3.12" }
+        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+        python: [3.10, 3.11, 3.12]    
     
     steps:
-      
       - name: Checkout code
         uses: actions/checkout@v4
       
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python.rel }}$
+          python-version: ${{ matrix.python }}$
 
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
@@ -39,23 +31,14 @@ jobs:
           python -m pip install cibuildwheel cython>=3.0.1
           python -m pip install numpy
       
-      - name: Build Wheels (MacOS)
-        if: ${{ runner.os == 'macOS' }}
-        env:
-          CIBW_BUILD: ${{ matrix.python.cp }}-${{ matrix.buildplat.sys }}*
-          CIBW_ARCHS: ${{ matrix.buildplat.arch }}
-          # Setting CIBW_ENVIRONMENT overrides the environment settings in
-          # pyproject.toml and would break the Windows build.  Ideally, we'd
-          # set all of them there, but don't know how to pass "benv".
-          CIBW_ENVIRONMENT: "MACOSX_DEPLOYMENT_TARGET=${{ matrix.buildplat.benv }}"
-          AUTH_TOKEN: ${{ github.token }}
-        run: python -m cibuildwheel --output-dir wheelhouse
+      - name: Build wheels
+        uses: pypa/cibuildwheels@v2.20.0
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.python.cp }}-${{ matrix.buildplat.sys }}-${{ matrix.buildplat.arch }}
-          path: ./wheelhouse/*
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
 
   build_sdist:
     name: Build source distribution
