@@ -1,0 +1,89 @@
+[project]
+
+name = "pybalu"
+
+description = "Python3 implementation of the computer vision and pattern recognition library Balu."
+
+dynamic = ["version", "readme"]
+
+authors = [
+    {name = "Marco Bucchi", email = "mabucchi@uc.cl"},
+    {name = "Domingo Mery", email = "domingo.mery@uc.cl"},
+]
+
+maintainers = [
+    {name = "Christian Pieringer", email = "cppierin@uc.cl"}
+]
+
+dependencies = [
+    "numpy >= 1.21.0",
+    "scipy",
+    "Pillow",
+    "imageio",
+    "scikit-learn",
+    "scikit-image",
+    "tqdm"
+]
+
+license = { file = "LICENSE" }
+
+requires-python = ">=3.10"
+
+
+[project.optional-dependencies]
+
+dev = [
+    "build",
+    "black",
+    "flake8",
+    "ruff",
+    "matplotlib",
+    "pytest",
+    "twine"
+]
+
+
+[build-system]
+
+requires = ["setuptools", "cython", "wheel", "numpy"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.setuptools]
+
+packages = [
+    "pybalu",
+    "pybalu.classification",
+    "pybalu.data_selection",
+    "pybalu.feature_analysis",
+    "pybalu.feature_extraction",
+    "pybalu.feature_selection",
+    "pybalu.feature_transformation",
+    "pybalu.img_processing",
+    "pybalu.io",
+    "pybalu.misc",
+    "pybalu.performance_eval",
+]
+
+[tool.setuptools.dynamic]
+
+version = { attr = "pybalu.__version__" }
+readme = { file = ["README.md"] }
+
+
+[tool.black]
+
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+
+[tool.ruff]
+
+line-length = 100
+
+
+[tool.ruff.format]
+
+indent-style = "tab"
+docstring-code-format = true
+docstring-code-line-length = 72
