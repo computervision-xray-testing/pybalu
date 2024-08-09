@@ -6,7 +6,7 @@ import numpy
 # Manage extensions
 geometric_utils = Extension(
 	"pybalu.feature_extraction.geometric_utils",
-	sources=["pybalu/feature_extraction/geometric_utils.pyx"],
+	sources=["./pybalu/feature_extraction/geometric_utils.pyx"],
 	include_dirs=[numpy.get_include()],
 )
 
@@ -40,7 +40,6 @@ external_modules = cythonize(
 
 
 # Package configuration
-
 setup(
 	ext_modules=external_modules,
 )
