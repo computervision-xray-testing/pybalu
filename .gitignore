@@ -108,3 +108,7 @@ venv.bak/
 
 # Poetry
 poetry.lock
+cython_build/
+
+# MacOS files
+**/.DS_Store

@@ -6,7 +6,8 @@ from setuptools import Distribution, Extension
 from Cython.Build import build_ext, cythonize
 
 
-cython_dir ="pybalu"
+cython_dir = "pybalu"
+output_dir = "cython_build"
 
 # Manage extensions
 geometric_utils = Extension(
@@ -43,7 +44,10 @@ external_modules = cythonize(
     cython_modules, 
     compiler_directives={"language_level": 3},
     include_path=[cython_dir],
+    build_dir=output_dir,
+    force=True
 )
+
 dist = Distribution({"ext_modules": external_modules})
 cmd = build_ext(dist)
 cmd.ensure_finalized()
