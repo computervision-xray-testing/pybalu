@@ -4,38 +4,37 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_wheels:
+  # build_wheels:
+  #   name: Build wheel on ${{ matrix.os }}-${{ matrix.python }}
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       os: [ubuntu-latest, windows-latest, macos-13, macos-14]
+  #       python: ["3.10", "3.11", "3.12"]    
     
-    name: Build wheel on ${{ matrix.os }}-${{ matrix.python }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
-        python: ["3.10", "3.11", "3.12"]    
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
       
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: ${{ matrix.python }}
 
-      - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
+  #     - name: Display Python version
+  #       run: python -c "import sys; print(sys.version)"
   
-      - name: Install Poetry
-        run: pipx install poetry
+  #     - name: Install Poetry
+  #       run: pipx install poetry
                 
-      - name: Build 
-        run: poetry build --format wheel
+  #     - name: Build 
+  #       run: poetry build --format wheel
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheels-${{ matrix.os }}-${{ strategy.job-index }}
-          path: dist/*.whl
+  #     - name: Upload Artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: wheels-${{ matrix.os }}-${{ strategy.job-index }}
+  #         path: dist/*.whl
 
   build_sdist:
     name: Build source distribution
@@ -61,10 +60,10 @@ jobs:
           name: sdist
           path: dist/*.tar.gz
 
-  publis-to-testpypi:
+  publish-to-testpypi:
     name: Publish package to TestPyPI
     needs:
-      - build_wheels
+      # - build_wheels
       - build_sdist
     runs-on: ubuntu-latest
     
