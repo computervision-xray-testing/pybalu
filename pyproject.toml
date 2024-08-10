@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pybalu"
-version = "0.3.1-alpha2"
+version = "0.3.1-alpha3"
 description = "Python3 implementation of the computer vision and pattern recognition library Balu."
 authors = [ "Marco Bucchi <mabucchi@uc.cl>", "Domingo Mery <domingo.mery@uc.cl>" ]
 maintainers = [ "Christian Pieringer <cppierin@uc.cl>" ]
@@ -36,7 +36,7 @@ pytest-benchmark = "^4.0.0"
 
 
 [build-system]
-requires = ["poetry-core", "Cython>=3.0.0", "setuptools>=70.0.0", "numpy>=2.0.0"]
+requires = ["poetry-core", "Cython", "setuptools", "numpy"]
 build-backend = "poetry.core.masonry.api"
 
 
