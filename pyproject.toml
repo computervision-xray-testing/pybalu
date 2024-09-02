@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pybalu"
-version = "0.3.1-alpha3"
+version = "0.3.1-alpha4"
 description = "Python3 implementation of the computer vision and pattern recognition library Balu."
 authors = [ "Marco Bucchi <mabucchi@uc.cl>", "Domingo Mery <domingo.mery@uc.cl>" ]
 maintainers = [ "Christian Pieringer <cppierin@uc.cl>" ]
@@ -9,6 +9,7 @@ license = "GNU"
 keywords = ["computer vision", "pattern recognition", "machine learning", "x-ray imaging"]
 homepage = "https://github.com/computervision-xray-testing"
 repository = "https://github.com/computervision-xray-testing/pybalu"
+package = [ { include = "pybalu" } ]
 
 
 [tool.poetry.dependencies]
@@ -28,7 +29,8 @@ script = "build.py"
 
 
 [tool.poetry.group.dev.dependencies]
-cython = "^3.0.11"
+cython = ">=3.*"
+setuptools = ">=69.*"
 ruff = "^0.5.7"
 matplotlib = "^3.9.1.post1"
 pytest = "^8.3.2"
@@ -36,7 +38,7 @@ pytest-benchmark = "^4.0.0"
 
 
 [build-system]
-requires = ["poetry-core", "Cython", "setuptools", "numpy"]
+requires = ["poetry-core", "cython >= 3.0.0", "setuptools >= 69.0.0", "numpy"]
 build-backend = "poetry.core.masonry.api"
 
 

@@ -45,6 +45,7 @@ external_modules = cythonize(
     compiler_directives={"language_level": 3},
     include_path=[cython_dir],
     build_dir=output_dir,
+    annotate=False,
     force=True
 )
 
