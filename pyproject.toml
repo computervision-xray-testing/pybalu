@@ -9,7 +9,6 @@ license = "GNU"
 keywords = ["computer vision", "pattern recognition", "machine learning", "x-ray imaging"]
 homepage = "https://github.com/computervision-xray-testing"
 repository = "https://github.com/computervision-xray-testing/pybalu"
-package = [ { include = "pybalu" } ]
 
 
 [tool.poetry.dependencies]
