@@ -37,7 +37,7 @@ pytest-benchmark = "^4.0.0"
 
 
 [build-system]
-requires = ["poetry-core", "Cython >= 3.0.0", "setuptools >= 69.0.0", "numpy"]
+requires = ["poetry-core", "Cython", "setuptools >= 69.0.0", "numpy"]
 build-backend = "poetry.core.masonry.api"
 
 
