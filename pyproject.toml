@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pybalu"
-version = "0.3.1-alpha4"
+version = "0.3.1-alpha5"
 description = "Python3 implementation of the computer vision and pattern recognition library Balu."
 authors = [ "Marco Bucchi <mabucchi@uc.cl>", "Domingo Mery <domingo.mery@uc.cl>" ]
 maintainers = [ "Christian Pieringer <cppierin@uc.cl>" ]
