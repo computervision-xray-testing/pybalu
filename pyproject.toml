@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pybalu"
-version = "0.3.1-alpha5"
+version = "0.3.1-alpha6"
 description = "Python3 implementation of the computer vision and pattern recognition library Balu."
 authors = [ "Marco Bucchi <mabucchi@uc.cl>", "Domingo Mery <domingo.mery@uc.cl>" ]
 maintainers = [ "Christian Pieringer <cppierin@uc.cl>" ]
@@ -28,8 +28,8 @@ script = "build.py"
 
 
 [tool.poetry.group.dev.dependencies]
-cython = ">=3.*"
-setuptools = ">=69.*"
+cython = ">=3.0.0"
+setuptools = ">=69.0.0"
 ruff = "^0.5.7"
 matplotlib = "^3.9.1.post1"
 pytest = "^8.3.2"

@@ -79,13 +79,13 @@ selected_feats = sfs(f_train_norm, c_train, n_features=N_FEATURES, method="fishe
 
 # %%
 def performance_for_features(feat_idxs):
-    # train classifier
-    knn = KNeighborsClassifier(n_neighbors=3)
-    knn.fit(f_train_norm[:, feat_idxs], c_train)
+	# train classifier
+	knn = KNeighborsClassifier(n_neighbors=3)
+	knn.fit(f_train_norm[:, feat_idxs], c_train)
 
-    # predict and evaluate performance
-    prediction = knn.predict(f_test_norm[:, feat_idxs])
-    return performance(prediction, c_test)
+	# predict and evaluate performance
+	prediction = knn.predict(f_test_norm[:, feat_idxs])
+	return performance(prediction, c_test)
 
 
 values = [performance_for_features(selected_feats[:i]) * 100 for i in range(1, N_FEATURES + 1)]
