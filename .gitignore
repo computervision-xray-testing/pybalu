@@ -105,3 +105,10 @@ venv.bak/
 
 # Ruff
 .ruff_cache
+
+# Poetry
+poetry.lock
+cython_build/
+
+# MacOS files
+**/.DS_Store
