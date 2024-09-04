@@ -79,8 +79,8 @@ jobs:
         with:
           path: dist/*.tar.gz
   
-  publish-to-testpypi:
-    name: Publish package to TestPyPI
+  publish-to-pypi:
+    name: Publish package to PyPI
     needs:
       - build_wheels
       - build_sdist
