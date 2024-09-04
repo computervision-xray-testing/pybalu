@@ -1,4 +1,4 @@
-![Build and upload to PyPI](hhttps://github.com/computervision-xray-testing/pybalu/workflows/Build%20and%20upload%20to%20PyPI/badge.svg)
+[![CI/CD](https://github.com/computervision-xray-testing/pybalu/actions/workflows/release.yml/badge.svg)](https://github.com/computervision-xray-testing/pybalu/actions/workflows/release.yml)
 
 
 # About the Project
